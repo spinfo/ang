@@ -1,0 +1,11 @@
+/ang.data/
+*.properties
+*.DS_Store
+.project
+.classpath
+.metadata/
+.recommenders/
+.settings/
+target/
+bin/
+tmp/
