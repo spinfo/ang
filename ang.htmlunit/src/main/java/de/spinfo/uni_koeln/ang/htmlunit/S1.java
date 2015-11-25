@@ -28,14 +28,14 @@ public class S1 {
 	private static int results = 100;
 	private static Sources sources = new Sources();
 	private static boolean resultChecked = false;
-	private static ArrayList<S1Entry> entriesList = new ArrayList<S1Entry>();
+//	private static ArrayList<S1Entry> entriesList = new ArrayList<S1Entry>();
 	private static boolean timeOut = false;
 
 	void listReader() throws IOException, InterruptedException {
 
 		int failureCount = 0;
 
-		String fileInput = FileUtils.inputPath + "anginput.txt";
+		String fileInput = FileUtils.inputPath + "ang_cleaned2.txt";
 
 		ArrayList<String> inputList = (ArrayList<String>) FileUtils.fileToList(fileInput);
 
@@ -54,7 +54,7 @@ public class S1 {
 
 		}
 		System.out.println("Anzahl der Abbrüche " + failureCount + "\n");
-		FileUtils.serializeList(entriesList, "serializedList" + sources.getSource(0));
+//		FileUtils.serializeList(entriesList, "serializedList" + sources.getSource(0));
 	}
 
 	public static void s1Crawler(String token) throws IOException, InterruptedException {
@@ -76,7 +76,7 @@ public class S1 {
 		entry.setDate(datum + " " + time);
 		entry.setPage(cnt);
 
-		String fileName = FileUtils.outputPath + token + ".txt";
+		String fileName = FileUtils.outputPath + "/new/" + token + ".txt";
 
 		ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileName));
 
@@ -90,6 +90,11 @@ public class S1 {
 
 		String adress = sources.getSource(0) + "/search?tab=blog&p=" + cnt + "&q=\"" + token + "\"&lng=de&";
 
+		/*
+		 *Alternativ:  String adress = sources.getSource(0) + "/search?tab=blog&p=" + cnt + "&q=%27" + token + "%27&lng=de&";
+		 * 
+		 */
+		
 		// ///////
 		logOff();
 		// ///////
@@ -152,7 +157,7 @@ public class S1 {
 
 		if (cnt == results) {
 			oos.writeObject(entry.toString());
-			entriesList.add(entry);
+//			entriesList.add(entry);
 			client.close();
 			oos.close();
 
