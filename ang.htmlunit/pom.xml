@@ -21,6 +21,11 @@
 			<artifactId>htmlunit</artifactId>
 			<version>2.18</version>
 		</dependency>
+		<dependency>
+			<groupId>de.uni_koeln.spinfo.ang</groupId>
+			<artifactId>ang.utils</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 
