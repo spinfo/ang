@@ -14,7 +14,7 @@ public class ToText {
 
 	private List<String> text;
 
-	public void writeThisDown(String input) throws IOException, ClassNotFoundException {
+	public void writeToText(String input) throws IOException, ClassNotFoundException {
 
 		FileInputStream fis = new FileInputStream(FileUtils.outputPath
 				+ input);
@@ -22,7 +22,7 @@ public class ToText {
 		text = (List<String>) ois.readObject();
 		ois.close();
 
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		for (String string : text) {
 			sb.append(string);
 			sb.append("\n");

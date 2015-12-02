@@ -8,11 +8,12 @@ public class App
     {
 
     	Generator g = new Generator();
-        g.generate();
+//    	g.generateList();
+        g.generateZirkumfix();
     	
-    	ToText t = new ToText();
-    	t.writeThisDown("anglizismenSuf");
-        t.writeThisDown("anglizismenPrae");
+//    	ToText t = new ToText();
+//    	t.writeToText("anglizismenZirk");
+//        t.writeToText("anglizismenPrae");
     	
     }
 }
