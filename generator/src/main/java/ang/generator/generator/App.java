@@ -7,13 +7,13 @@ public class App
     public static void main( String[] args ) throws ClassNotFoundException, IOException
     {
 
-    	Generator g = new Generator();
+//    	Generator g = new Generator();
 //    	g.generateList();
-        g.generateZirkumfix();
-    	
-//    	ToText t = new ToText();
-//    	t.writeToText("anglizismenZirk");
-//        t.writeToText("anglizismenPrae");
+//        g.generateSufPrae();
+//    	
+    	ToText t = new ToText();
+    	t.writeToText("anglizismenSuf");
+        t.writeToText("anglizismenPrae");
     	
     }
 }

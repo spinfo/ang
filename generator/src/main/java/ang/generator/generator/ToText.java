@@ -1,7 +1,6 @@
 package ang.generator.generator;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -14,6 +13,7 @@ public class ToText {
 
 	private List<String> text;
 
+	@SuppressWarnings("unchecked")
 	public void writeToText(String input) throws IOException, ClassNotFoundException {
 
 		FileInputStream fis = new FileInputStream(FileUtils.outputPath
@@ -23,6 +23,7 @@ public class ToText {
 		ois.close();
 
 		StringBuilder sb = new StringBuilder();
+		sb.append(" \n ");
 		for (String string : text) {
 			sb.append(string);
 			sb.append("\n");

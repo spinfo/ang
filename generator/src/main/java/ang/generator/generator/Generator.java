@@ -1,13 +1,11 @@
 package ang.generator.generator;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.tartarus.snowball.SnowballStemmer;
@@ -26,13 +24,15 @@ public class Generator {
 	private List<String> englStemms;
 	private List<String> anglizismenPrae = new ArrayList<String>();
 	private List<String> anglizismenSuf = new ArrayList<String>();
-	private List<String> anglizismenZirk = new ArrayList<String>();
-	private List<String> anglizismen = new ArrayList<String>();
+	private List<String> anglizismenZirk = new LinkedList<String>();
 
 	
 	/*
-	 * Füllt die Listen mit Inhalt. Liest serialisierte Files mit Präfixen, Suffixen, englischen Tokens und stopwords aus und serialisiert diese.
+	 * Füllt die Listen mit Inhalt. 
+	 * Liest Input Text-Files mit Präfixen, Suffixen, 
+	 * englischen Tokens und stopwords aus und serialisiert diese.
 	 * */
+	
 	public void generateList() throws IOException {
 		HashSet<String> p = new HashSet<String>();
 		p.addAll(FileUtils.fileToList(FileUtils.inputPath
@@ -67,6 +67,7 @@ public class Generator {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	private void read() throws ClassNotFoundException, IOException {
 
 		FileInputStream fis = new FileInputStream(FileUtils.outputPath
@@ -99,7 +100,7 @@ public class Generator {
 			stemmer.stem();
 			result.add(stemmer.getCurrent());
 		}
-
+		System.out.println(result.size());
 		return result;
 	}
 
@@ -108,42 +109,47 @@ public class Generator {
 	public void generateSufPrae() throws ClassNotFoundException, IOException {
 		read();
 		
-		englStemms = getStems();
-
-		for (String englStrig : englStemms) {
-			String angP = new String();
-			for (String praString : praefix) {
-				angP = praString + englStrig;
-				anglizismenPrae.add(angP);
-			}
-		}
-
-		for (String englStrig : englStemms) {
-			String angS = new String();
-			for (String sufString : suffix) {
-				angS = englStrig + sufString;
-				anglizismenSuf.add(angS);
-			}
-		}
+		anglizismenSuf = generateConcatList(suffix, false);
+		anglizismenPrae = generateConcatList(praefix, true);
 
 		FileUtils.serializeList(anglizismenSuf, "anglizismenSuf");
 		FileUtils.serializeList(anglizismenPrae, "anglizismenPrae");
 
 	}
+	
+	private List<String> generateConcatList(List<String> affixList, boolean putInFront){
+		List<String> anglizismenAff = new ArrayList<String>();
+		
+		englStemms = getStems();
+		
+		for (String englStrig : englStemms) {
+			
+			for (String praString : affixList) {
+				String angP = new String();
+				if(putInFront){
+				angP = praString + englStrig;}
+				else{
+					angP = englStrig + praString;
+				}
+				anglizismenAff.add(angP);
+			}
+		}
+		
+		return anglizismenAff;
+	}
+	
 
 	public void generateZirkumfix() throws IOException, ClassNotFoundException {
-		
-		generateSufPrae();
-		System.out.println(anglizismenSuf.size());
-//		read();
+		read();
+		anglizismenSuf = generateConcatList(suffix, false);
 		int i=0;
 		
 		for (String stringSuf : anglizismenSuf) {
+			System.out.println(stringSuf);
 			for (String prae : praefix) {
 				String s = new String();
 				s = prae + stringSuf;
-				
-				
+				System.out.println(s);
 				anglizismenZirk.add(s);
 			}
 			System.out.println(i);
