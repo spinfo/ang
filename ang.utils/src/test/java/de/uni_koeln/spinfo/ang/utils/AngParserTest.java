@@ -29,7 +29,7 @@ public class AngParserTest {
 		Set<String> cleaned_set = new LinkedHashSet<>(cleaned);
 
 		FileUtils.printSet(cleaned_set, FileUtils.outputPath, "ang_set_");
-		FileUtils.printList(cleaned, FileUtils.outputPath, "ang_list_");
+		FileUtils.listToTXT(cleaned, FileUtils.outputPath, "ang_list_");
 
 	}
 

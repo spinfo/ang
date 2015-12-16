@@ -11,7 +11,9 @@
 		<module>../ang.htmlunit</module>
 		<module>../ang.twitter</module>
 		<module>../ang.utils</module>
-
+		<module>../ang.corpusreader</module>
+		<module>../ang.cse</module>
+		
 	</modules>
 
 	<dependencies>
