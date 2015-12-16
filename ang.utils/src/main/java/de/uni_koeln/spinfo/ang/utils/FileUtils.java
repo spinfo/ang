@@ -44,11 +44,25 @@ public class FileUtils {
 		return normalized;
 	}
 
-	public static <T> void serializeList(List<T> matchedWords, String fileName) throws IOException {
+	public static <T> void serializeList(List<T> list, String fileName) throws IOException {
 
 		ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(outputPath + fileName));
 
-		outputStream.writeObject(matchedWords);
+		outputStream.writeObject(list);
+
+		outputStream.close();
+
+	}
+
+	public static <T> void serializeList(List<T> list, String destPath, String fileName) throws IOException {
+
+		fileName = fileName + ".ser";
+
+		File file = new File(destPath + fileName);
+
+		ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
+
+		outputStream.writeObject(list);
 
 		outputStream.close();
 
@@ -86,9 +100,26 @@ public class FileUtils {
 		return file;
 	}
 
-	public static <T> File printList(List<T> list, String destPath, String filename) throws IOException {
+	public static <T> File listToTXT(List<T> list, String destPath, String filename) throws IOException {
 
 		File file = new File(destPath + filename + getISO8601StringForCurrentDate() + ".txt");
+
+		Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
+
+		for (Object o : list) {
+			writer.append(o + "\n");
+		}
+
+		writer.flush();
+		writer.close();
+
+		return file;
+	}
+
+	public static <T> File printList(List<T> list, String destPath, String filename, String fileFormat)
+			throws IOException {
+
+		File file = new File(destPath + filename + fileFormat);
 
 		Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
 
