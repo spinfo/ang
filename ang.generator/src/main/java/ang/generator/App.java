@@ -1,4 +1,4 @@
-package ang.generator.generator;
+package ang.generator;
 
 import java.io.IOException;
 
