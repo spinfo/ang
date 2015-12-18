@@ -1,4 +1,4 @@
-package de.uni_koeln.spinfo.spritzer;
+package de.uni_koeln.spinfo.ang.spritzer;
 
 import java.io.IOException;
 import java.util.Properties;
