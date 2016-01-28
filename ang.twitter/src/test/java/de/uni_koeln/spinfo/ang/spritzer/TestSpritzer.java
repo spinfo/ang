@@ -4,9 +4,8 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
-
-import de.uni_koeln.spinfo.ang.spritzer.Spritzer;
 
 public class TestSpritzer {
 
@@ -19,6 +18,7 @@ public class TestSpritzer {
 
 	}
 
+	@Ignore
 	@Test
 	public void testListenStream() throws InterruptedException, IOException {
 
