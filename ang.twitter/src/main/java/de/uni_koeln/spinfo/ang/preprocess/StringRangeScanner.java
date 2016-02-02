@@ -19,6 +19,7 @@ public class StringRangeScanner {
 		this.inputStream = inputStream;
 		this.scanner = new Scanner(inputStream);
 		this.scanner.useDelimiter(startPattern);
+		if (hasNext()) scanner.next(); //skip first hit
 	}
 	
 	

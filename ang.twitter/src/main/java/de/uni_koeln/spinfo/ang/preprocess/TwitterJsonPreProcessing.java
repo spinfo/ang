@@ -4,6 +4,8 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import de.uni_koeln.spinfo.ang.benchmark.BenchmarkData;
 import de.uni_koeln.spinfo.ang.benchmark.SimpleBenchmark;
@@ -14,8 +16,13 @@ public class TwitterJsonPreProcessing {
 	private StringRangeScanner srs;
 	private SimpleBenchmark bMark;
 	
-	private static final String PATTERN_START = "\\\"text\\\":\\\"";
+	private static final String PATTERN_START = "\\{\\\"created_at\\\"\\:.+\\\"text\\\"\\:\\\"";
 	private static final String PATTERN_END   = "(?<!\\\\)\\\"";
+	
+	private static final String PATTERN_TWITTER_MENTION = "(?<=^|(?<=[^a-zA-Z0-9-\\.]))@([A-Za-z0-9_]+)[^a-zA-Z0-9_]";
+	private static final String PATTERN_TWITTER_HASHTAG = "(?<=^|(?<=[^a-zA-Z0-9-_\\.]))#([A-Za-z]+[A-Za-z0-9_]+)";
+	private static final String PATTERN_TWITTER_RETWEET = "RT\\s" + PATTERN_TWITTER_MENTION + "\\s";
+	
 	private static final String FILE_PATH     = "/Users/bkiss/Documents/testdata/test.json";
 	
 	
@@ -35,12 +42,21 @@ public class TwitterJsonPreProcessing {
 		srs = createScanner(path);
 		bMark = new SimpleBenchmark();
 		bMark.startNewBenchmark("pre-processing of " + FILE_PATH);
+		StringBuilder sb = new StringBuilder();
 		
 		//TODO pre-process
-		if (srs.hasNext()){
-			String s = srs.next();
-			System.out.println(s);
+		while (srs.hasNext()){
+			sb.append(normalize(srs.next()) + "\n");
 			bMark.newStep();
+		}
+		
+		//write output file
+		try {
+			FileWriter fw = new FileWriter("output.txt");
+			fw.write(sb.toString());
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		
 		return bMark.stopBenchMark();
@@ -61,5 +77,11 @@ public class TwitterJsonPreProcessing {
 	}
 	
 	
-
+	private String normalize(String input){
+		return input.replaceAll(PATTERN_TWITTER_HASHTAG, "")
+				.replaceAll(PATTERN_TWITTER_RETWEET, "")
+				.replaceAll(PATTERN_TWITTER_MENTION, "");
+	}
+	
+	
 }
