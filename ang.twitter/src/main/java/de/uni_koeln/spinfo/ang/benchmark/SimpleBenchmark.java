@@ -6,7 +6,7 @@ public class SimpleBenchmark {
 	public static final String ERR_RUNNING = "[BMARK]\tError: Benchmark currently running";
 	
 	private long startTime;
-	private long endTime;
+	private long stopTime;
 	private long stepCount;
 	private String benchmarkTitle;
 	private boolean running;
@@ -19,13 +19,15 @@ public class SimpleBenchmark {
 		}
 		
 		running = true;
+		stepCount = 0;
+		stopTime = 0;
 		this.benchmarkTitle = benchmarkTitle;
 		startTime = System.currentTimeMillis();
 	}
 	
 	
 	public BenchmarkData stopBenchMark(){
-		endTime = System.currentTimeMillis();
+		stopTime = System.currentTimeMillis();
 		
 		if (!running){
 			System.err.println(ERR_NOT_RUNNING);
@@ -33,13 +35,15 @@ public class SimpleBenchmark {
 		}
 		
 		running = false;
-		return new BenchmarkData(benchmarkTitle, startTime, endTime, stepCount);
+		return new BenchmarkData(benchmarkTitle, startTime, stopTime, stepCount);
 	}
 
+	
 	public void newStep(){
 		if (!running){
 			System.err.println(ERR_NOT_RUNNING);
 			return;
 		}
+		stepCount++;
 	}
 }
