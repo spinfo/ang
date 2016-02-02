@@ -9,7 +9,7 @@ import de.uni_koeln.spinfo.ang.benchmark.BenchmarkData;
 import de.uni_koeln.spinfo.ang.benchmark.SimpleBenchmark;
 
 
-public class TwitterJsonPreProcessor {
+public class TwitterJsonPreProcessing {
 	
 	private StringRangeScanner srs;
 	private SimpleBenchmark bMark;
@@ -20,7 +20,7 @@ public class TwitterJsonPreProcessor {
 	
 	
 	public static void main(String[] args) {
-		TwitterJsonPreProcessor pre = new TwitterJsonPreProcessor();
+		TwitterJsonPreProcessing pre = new TwitterJsonPreProcessing();
 		
 		try {
 			pre.preProcess(FILE_PATH).printReport();
