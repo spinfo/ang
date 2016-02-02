@@ -24,7 +24,7 @@ public class TwitterJsonPreProcessing {
 	private static final String PATTERN_TWITTER_MENTION = "(?<=^|(?<=[^a-zA-Z0-9-\\.]))@([A-Za-z0-9_]+)([^a-zA-Z0-9_]|$)";
 	private static final String PATTERN_TWITTER_HASHTAG = "(?<=^|(?<=[^a-zA-Z0-9-_\\.]))#([A-Za-z]+[A-Za-z0-9_]+)";
 	private static final String PATTERN_TWITTER_RETWEET = "RT\\s" + PATTERN_TWITTER_MENTION + "\\s";
-	private static final String PATTERN_UNICODES		= "\\\\u[a-fA-F0-9]{4}";
+	private static final String PATTERN_UNICODES		= "\\\\u(?=[a-fA-F0-9]{4})";
 	private static final String PATTERN_STR_HAS_WORDS	= ".*\\p{L}.*";
 	
 	private static final String FILE_PATH     = "/Users/bkiss/Documents/testdata/test.json";
@@ -86,9 +86,7 @@ public class TwitterJsonPreProcessing {
 		return Normalizer.normalize(input, Form.NFC)
 				.replaceAll(PATTERN_TWITTER_HASHTAG, "")
 				.replaceAll(PATTERN_TWITTER_RETWEET, "")
-				.replaceAll(PATTERN_TWITTER_MENTION, "")
-				//.replaceAll(PATTERN_UNICODES, "");
-		;
+				.replaceAll(PATTERN_TWITTER_MENTION, "");
 	}
 	
 	
