@@ -1,11 +1,15 @@
 package de.uni_koeln.spinfo.ang.preprocess;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
 
@@ -57,9 +61,12 @@ public class TwitterJsonPreProcessing {
 		
 		//write output file
 		try {
-			FileWriter fw = new FileWriter("output.txt");
-			fw.write(sb.toString());
-			fw.close();
+			Writer out = new BufferedWriter(
+					new OutputStreamWriter(
+				    new FileOutputStream("output.txt"), "UTF-8"));
+			out.write(sb.toString());
+			out.flush();
+			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
