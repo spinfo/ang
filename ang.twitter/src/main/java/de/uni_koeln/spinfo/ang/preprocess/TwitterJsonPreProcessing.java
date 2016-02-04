@@ -13,6 +13,8 @@ import java.io.Writer;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import de.uni_koeln.spinfo.ang.benchmark.BenchmarkData;
 import de.uni_koeln.spinfo.ang.benchmark.SimpleBenchmark;
 
@@ -21,6 +23,8 @@ public class TwitterJsonPreProcessing {
 	
 	private StringRangeScanner srs;
 	private SimpleBenchmark bMark;
+	
+	private static final String OUTPUT_FILE = "output_preprocessing.txt";
 	
 	private static final String PATTERN_START = "\\{\\\"created_at\\\"\\:.+\\\"text\\\"\\:\\\"";
 	private static final String PATTERN_END   = "(?<!\\\\)\\\"";
@@ -63,7 +67,7 @@ public class TwitterJsonPreProcessing {
 		try {
 			Writer out = new BufferedWriter(
 					new OutputStreamWriter(
-				    new FileOutputStream("output.txt"), "UTF-8"));
+				    new FileOutputStream(OUTPUT_FILE), "UTF-8"));
 			out.write(sb.toString());
 			out.flush();
 			out.close();
@@ -90,6 +94,7 @@ public class TwitterJsonPreProcessing {
 	
 	
 	private String normalize(String input){
+		input = StringEscapeUtils.unescapeJava(input);
 		return Normalizer.normalize(input, Form.NFC)
 				.replaceAll(PATTERN_TWITTER_HASHTAG, "")
 				.replaceAll(PATTERN_TWITTER_RETWEET, "")
