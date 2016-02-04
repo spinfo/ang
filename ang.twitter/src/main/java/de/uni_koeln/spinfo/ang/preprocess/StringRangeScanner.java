@@ -29,7 +29,11 @@ public class StringRangeScanner {
 	
 	
 	public String next(){
-		return scanner.next().split(endPattern)[0];
+		if (endPattern != null){
+			return scanner.next().split(endPattern)[0];
+		} else {
+			return scanner.next();
+		}
 	}
 
 

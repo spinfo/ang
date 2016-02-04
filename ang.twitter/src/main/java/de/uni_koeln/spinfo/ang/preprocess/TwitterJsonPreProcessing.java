@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -55,13 +54,20 @@ public class TwitterJsonPreProcessing {
 		bMark = new SimpleBenchmark();
 		bMark.startNewBenchmark("pre-processing of " + FILE_PATH);
 		StringBuilder sb = new StringBuilder();
+		long count = 0;
 		
-		//TODO pre-process
+		// pre-process
 		while (srs.hasNext()){
 			String s = normalize(srs.next());
-			if (s.matches(PATTERN_STR_HAS_WORDS)) sb.append(s + "\n");
+			s = s.replaceAll("\\;", "");
+			s = s.replaceAll("\\\"", "'");
+			sb.append(count++);
+			sb.append(";");
+			sb.append(s);
+			sb.append("\n");
 			bMark.newStep();
 		}
+		sb.deleteCharAt(sb.lastIndexOf("\n"));
 		
 		//write output file
 		try {
@@ -94,7 +100,7 @@ public class TwitterJsonPreProcessing {
 	
 	
 	private String normalize(String input){
-		input = StringEscapeUtils.unescapeJava(input);
+		//input = StringEscapeUtils.unescapeJava(input);
 		return Normalizer.normalize(input, Form.NFC)
 				.replaceAll(PATTERN_TWITTER_HASHTAG, "")
 				.replaceAll(PATTERN_TWITTER_RETWEET, "")
