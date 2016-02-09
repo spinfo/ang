@@ -17,11 +17,16 @@ import org.jsfr.json.JsonSurfer;
 import org.jsfr.json.ParsingContext;
 import org.jsfr.json.SurfingConfiguration;
 import org.jsfr.json.provider.JavaCollectionProvider;
+import org.tmatesoft.sqljet.core.SqlJetException;
+import org.tmatesoft.sqljet.core.internal.table.SqlJetTable;
+import org.tmatesoft.sqljet.core.table.ISqlJetTable;
+import org.tmatesoft.sqljet.core.table.SqlJetDb;
 
 import com.fasterxml.jackson.core.JsonParseException;
 
 import de.uni_koeln.spinfo.ang.benchmark.BenchmarkData;
 import de.uni_koeln.spinfo.ang.benchmark.SimpleBenchmark;
+import de.uni_koeln.spinfo.ang.goldstnd.SqliteWrapper;
 
 
 public class TwitterJsonPreProcessing {
@@ -54,46 +59,51 @@ public class TwitterJsonPreProcessing {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (SqlJetException e) {
+			e.printStackTrace();
 		}
 		
 	}
 	
 	
-	public BenchmarkData preProcess(String path) throws JsonParseException, IOException{
+	public BenchmarkData preProcess(String path) throws JsonParseException, IOException, SqlJetException{
 		bMark = new SimpleBenchmark();
 		bMark.startNewBenchmark("pre-processing of " + FILE_PATH);
-		final StringBuilder sb = new StringBuilder();
+//		final StringBuilder sb = new StringBuilder();
+		final SqliteWrapper sqlw = new SqliteWrapper();
+		SqlJetDb db = sqlw.createAndOpenNewDB();
+		final ISqlJetTable table = sqlw.getTable(db, "data_todo");
+		sqlw.preTransaction(db);
 		
 		BufferedReader br = new BufferedReader(new FileReader(path));
 		JsonSurfer surfer = new JsonSurfer(JacksonParser.INSTANCE, JavaCollectionProvider.INSTANCE);
         SurfingConfiguration config = surfer.configBuilder().bind("$.text", new JsonPathListener() {
-                	private long count = 0;
+                	private int count = 0;
                 	
                     @Override
                     public void onValue(Object value, ParsingContext context) throws Exception {
             			String s = normalize(value.toString());
             			s = s.replaceAll("\\;", "");
             			s = s.replaceAll("\\\"", "'");
-            			sb.append(count++);
-            			sb.append(";");
-            			sb.append(s);
-            			sb.append("\n");
+            			sqlw.insertRowTodo(table, count++, s, "archive.zip");
             			bMark.newStep();
                     }
                 }).build();
         surfer.surf(br, config);
+        sqlw.postTransaction(db);
+        db.close();
 		
 		//write output file
-		try {
-			Writer out = new BufferedWriter(
-					new OutputStreamWriter(
-				    new FileOutputStream(OUTPUT_FILE), "UTF-8"));
-			out.write(sb.toString());
-			out.flush();
-			out.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			Writer out = new BufferedWriter(
+//					new OutputStreamWriter(
+//				    new FileOutputStream(OUTPUT_FILE), "UTF-8"));
+//			out.write(sb.toString());
+//			out.flush();
+//			out.close();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 		
 		return bMark.stopBenchMark();
 	}
@@ -120,6 +130,8 @@ public class TwitterJsonPreProcessing {
 				.replaceAll(PATTERN_TWITTER_RETWEET, "")
 				.replaceAll(PATTERN_TWITTER_MENTION, "");
 	}
+	
+	
 	
 	
 }
