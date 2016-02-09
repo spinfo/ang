@@ -1,5 +1,6 @@
 package de.uni_koeln.spinfo.ang.preprocess;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -14,6 +15,7 @@ import org.jsfr.json.JacksonParser;
 import org.jsfr.json.JsonPathListener;
 import org.jsfr.json.JsonSurfer;
 import org.jsfr.json.ParsingContext;
+import org.jsfr.json.SurfingConfiguration;
 import org.jsfr.json.provider.JavaCollectionProvider;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -60,13 +62,11 @@ public class TwitterJsonPreProcessing {
 	public BenchmarkData preProcess(String path) throws JsonParseException, IOException{
 		bMark = new SimpleBenchmark();
 		bMark.startNewBenchmark("pre-processing of " + FILE_PATH);
-		
 		final StringBuilder sb = new StringBuilder();
 		
+		BufferedReader br = new BufferedReader(new FileReader(path));
 		JsonSurfer surfer = new JsonSurfer(JacksonParser.INSTANCE, JavaCollectionProvider.INSTANCE);
-        surfer.configBuilder()
-                .bind("$.text", new JsonPathListener() {
-                	
+        SurfingConfiguration config = surfer.configBuilder().bind("$.text", new JsonPathListener() {
                 	private long count = 0;
                 	
                     @Override
@@ -80,8 +80,8 @@ public class TwitterJsonPreProcessing {
             			sb.append("\n");
             			bMark.newStep();
                     }
-                })
-                .buildAndSurf(new FileReader(path));
+                }).build();
+        surfer.surf(br, config);
 		
 		//write output file
 		try {
