@@ -1,18 +1,22 @@
 package de.uni_koeln.spinfo.ang.preprocess;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.jsfr.json.JacksonParser;
+import org.jsfr.json.JsonPathListener;
+import org.jsfr.json.JsonSurfer;
+import org.jsfr.json.ParsingContext;
+import org.jsfr.json.provider.JavaCollectionProvider;
+
+import com.fasterxml.jackson.core.JsonParseException;
 
 import de.uni_koeln.spinfo.ang.benchmark.BenchmarkData;
 import de.uni_koeln.spinfo.ang.benchmark.SimpleBenchmark;
@@ -20,7 +24,7 @@ import de.uni_koeln.spinfo.ang.benchmark.SimpleBenchmark;
 
 public class TwitterJsonPreProcessing {
 	
-	private StringRangeScanner srs;
+//	private StringRangeScanner srs;
 	private SimpleBenchmark bMark;
 	
 	private static final String OUTPUT_FILE = "output_preprocessing.txt";
@@ -44,30 +48,40 @@ public class TwitterJsonPreProcessing {
 			pre.preProcess(FILE_PATH).printReport();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		
 	}
 	
 	
-	public BenchmarkData preProcess(String path) throws FileNotFoundException{
-		srs = createScanner(path);
+	public BenchmarkData preProcess(String path) throws JsonParseException, IOException{
 		bMark = new SimpleBenchmark();
 		bMark.startNewBenchmark("pre-processing of " + FILE_PATH);
-		StringBuilder sb = new StringBuilder();
-		long count = 0;
 		
-		// pre-process
-		while (srs.hasNext()){
-			String s = normalize(srs.next());
-			s = s.replaceAll("\\;", "");
-			s = s.replaceAll("\\\"", "'");
-			sb.append(count++);
-			sb.append(";");
-			sb.append(s);
-			sb.append("\n");
-			bMark.newStep();
-		}
-		sb.deleteCharAt(sb.lastIndexOf("\n"));
+		final StringBuilder sb = new StringBuilder();
+		
+		JsonSurfer surfer = new JsonSurfer(JacksonParser.INSTANCE, JavaCollectionProvider.INSTANCE);
+        surfer.configBuilder()
+                .bind("$.text", new JsonPathListener() {
+                	
+                	private long count = 0;
+                	
+                    @Override
+                    public void onValue(Object value, ParsingContext context) throws Exception {
+            			String s = normalize(value.toString());
+            			s = s.replaceAll("\\;", "");
+            			s = s.replaceAll("\\\"", "'");
+            			sb.append(count++);
+            			sb.append(";");
+            			sb.append(s);
+            			sb.append("\n");
+            			bMark.newStep();
+                    }
+                })
+                .buildAndSurf(new FileReader(path));
 		
 		//write output file
 		try {
@@ -85,18 +99,18 @@ public class TwitterJsonPreProcessing {
 	}
 	
 	
-	private StringRangeScanner createScanner(String filePath) throws FileNotFoundException{
-		File file = new File(filePath);
-		
-		if (!file.exists() || !file.isFile()){
-			System.err.println("[ERROR]\t\"" + filePath + " \"could not be found or is not a regular file!");
-			return null;
-		}
-		
-		FileInputStream fis = new FileInputStream(file);
-		BufferedInputStream bis = new BufferedInputStream(fis);
-		return new StringRangeScanner(PATTERN_START, PATTERN_END, bis);
-	}
+//	private StringRangeScanner createScanner(String filePath) throws FileNotFoundException{
+//		File file = new File(filePath);
+//		
+//		if (!file.exists() || !file.isFile()){
+//			System.err.println("[ERROR]\t\"" + filePath + " \"could not be found or is not a regular file!");
+//			return null;
+//		}
+//		
+//		FileInputStream fis = new FileInputStream(file);
+//		BufferedInputStream bis = new BufferedInputStream(fis);
+//		return new StringRangeScanner(PATTERN_START, PATTERN_END, bis);
+//	}
 	
 	
 	private String normalize(String input){
