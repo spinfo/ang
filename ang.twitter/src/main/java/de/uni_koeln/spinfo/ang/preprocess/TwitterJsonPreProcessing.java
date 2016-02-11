@@ -1,13 +1,9 @@
 package de.uni_koeln.spinfo.ang.preprocess;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
 
@@ -18,15 +14,13 @@ import org.jsfr.json.ParsingContext;
 import org.jsfr.json.SurfingConfiguration;
 import org.jsfr.json.provider.JavaCollectionProvider;
 import org.tmatesoft.sqljet.core.SqlJetException;
-import org.tmatesoft.sqljet.core.internal.table.SqlJetTable;
-import org.tmatesoft.sqljet.core.table.ISqlJetTable;
-import org.tmatesoft.sqljet.core.table.SqlJetDb;
 
 import com.fasterxml.jackson.core.JsonParseException;
 
 import de.uni_koeln.spinfo.ang.benchmark.BenchmarkData;
 import de.uni_koeln.spinfo.ang.benchmark.SimpleBenchmark;
-import de.uni_koeln.spinfo.ang.goldstnd.SqliteWrapper;
+import de.uni_koeln.spinfo.ang.langdetect.IGermanDetector;
+import de.uni_koeln.spinfo.ang.langdetect.TikaGermanDetector;
 
 
 public class TwitterJsonPreProcessing {
@@ -34,7 +28,7 @@ public class TwitterJsonPreProcessing {
 //	private StringRangeScanner srs;
 	private SimpleBenchmark bMark;
 	
-	private static final String OUTPUT_FILE = "output_preprocessing.txt";
+	private static final String OUTPUT_FILE = "output_test.txt";
 	
 	private static final String PATTERN_START = "\\{\\\"created_at\\\"\\:.+\\\"text\\\"\\:\\\"";
 	private static final String PATTERN_END   = "(?<!\\\\)\\\"";
@@ -44,9 +38,9 @@ public class TwitterJsonPreProcessing {
 	private static final String PATTERN_TWITTER_RETWEET = "RT\\s" + PATTERN_TWITTER_MENTION + "\\s";
 	private static final String PATTERN_UNICODES		= "\\\\u(?=[a-fA-F0-9]{4})";
 	private static final String PATTERN_STR_HAS_WORDS	= ".*\\p{L}.*";
+	private static final String PATTERN_URL				= "(http|https|ftp)\\:\\/\\/[^\\s$]+(?=(\\s|$))";
 	
 	private static final String FILE_PATH     = "/Users/bkiss/Documents/testdata/test.json";
-	
 	
 	public static void main(String[] args) {
 		TwitterJsonPreProcessing pre = new TwitterJsonPreProcessing();
@@ -70,30 +64,38 @@ public class TwitterJsonPreProcessing {
 		bMark = new SimpleBenchmark();
 		bMark.startNewBenchmark("pre-processing of " + FILE_PATH);
 //		final StringBuilder sb = new StringBuilder();
-		final SqliteWrapper sqlw = new SqliteWrapper();
-		SqlJetDb db = sqlw.createAndOpenNewDB();
-		final ISqlJetTable table = sqlw.getTable(db, "data_todo");
-		sqlw.preTransaction(db);
+//		final SqliteWrapper sqlw = new SqliteWrapper();
+//		SqlJetDb db = sqlw.createAndOpenNewDB();
+//		final ISqlJetTable table = sqlw.getTable(db, "data_todo");
+//		sqlw.preTransaction(db);
 		
 		BufferedReader br = new BufferedReader(new FileReader(path));
 		JsonSurfer surfer = new JsonSurfer(JacksonParser.INSTANCE, JavaCollectionProvider.INSTANCE);
         SurfingConfiguration config = surfer.configBuilder().bind("$.text", new JsonPathListener() {
                 	private int count = 0;
+                	private IGermanDetector detector = new TikaGermanDetector();
+//                	private IGermanDetector detector = new NaiveGermanDetector();
+//                	private IGermanDetector detector = new LangDetectGermanDetector();
+//                	private IGermanDetector detector = new StopWordsGermanDetector();
                 	
                     @Override
                     public void onValue(Object value, ParsingContext context) throws Exception {
             			String s = normalize(value.toString());
-            			s = s.replaceAll("\\;", "");
-            			s = s.replaceAll("\\\"", "'");
-            			sqlw.insertRowTodo(table, count++, s, "archive.zip");
-            			bMark.newStep();
+//            			sqlw.insertRowTodo(table, count++, s);
+//            			System.out.println(s);
+            			
+            			//german language detection test
+            			if (detector.isGerman(s)){
+            				System.out.println("DE\t" + s);
+            				bMark.newStep();
+            			}
                     }
                 }).build();
         surfer.surf(br, config);
-        sqlw.postTransaction(db);
-        db.close();
-		
-		//write output file
+//        sqlw.postTransaction(db);
+//        db.close();
+
+        //write output file
 //		try {
 //			Writer out = new BufferedWriter(
 //					new OutputStreamWriter(
@@ -126,12 +128,20 @@ public class TwitterJsonPreProcessing {
 	private String normalize(String input){
 		//input = StringEscapeUtils.unescapeJava(input);
 		return Normalizer.normalize(input, Form.NFC)
+				.replaceAll("\n", " ")
 				.replaceAll(PATTERN_TWITTER_HASHTAG, "")
 				.replaceAll(PATTERN_TWITTER_RETWEET, "")
-				.replaceAll(PATTERN_TWITTER_MENTION, "");
+				.replaceAll(PATTERN_TWITTER_MENTION, "")
+				.replaceAll(PATTERN_URL, "")
+				.replaceAll("[\\x0E-\\x1F]", "");
 	}
 	
-	
-	
+//	private boolean detectGerman(String text){
+//		LanguageIdentifier li = new LanguageIdentifier(text);
+//	    if (li.getLanguage().equals("de"))
+//	        return true;
+//	    else
+//	    	return false;
+//	}
 	
 }
