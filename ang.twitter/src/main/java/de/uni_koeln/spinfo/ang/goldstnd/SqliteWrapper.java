@@ -17,7 +17,6 @@ public class SqliteWrapper {
 
     private static final String FIELD_ID = "id";
     private static final String FIELD_TEXT = "text";
-    private static final String FIELD_ARCHIVE = "archive";
     private static final String FIELD_LANG_DE = "lang_de_manual";
     
     
@@ -38,8 +37,8 @@ public class SqliteWrapper {
             
         db.beginTransaction(SqlJetTransactionMode.WRITE);
         try {            
-            db.createTable("CREATE TABLE " + TABLE_1_NAME + " (" + FIELD_ID + " INTEGER NOT NULL, " + FIELD_TEXT + " TEXT NOT NULL, " + FIELD_ARCHIVE + " TEXT NOT NULL)");
-            db.createTable("CREATE TABLE " + TABLE_2_NAME + " (" + FIELD_ID + " INTEGER NOT NULL, " + FIELD_TEXT + " TEXT NOT NULL, " + FIELD_ARCHIVE + " TEXT NOT NULL, "  + FIELD_LANG_DE + " BOOLEAN NOT NULL)");
+            db.createTable("CREATE TABLE " + TABLE_1_NAME + " (" + FIELD_ID + " INTEGER NOT NULL, " + FIELD_TEXT + " TEXT NOT NULL)");
+            db.createTable("CREATE TABLE " + TABLE_2_NAME + " (" + FIELD_ID + " INTEGER NOT NULL, " + FIELD_TEXT + " TEXT NOT NULL, "  + FIELD_LANG_DE + " BOOLEAN NOT NULL)");
         } finally {
             db.commit();
         }
@@ -63,12 +62,12 @@ public class SqliteWrapper {
     	return db.getTable(tableName);
     }
     
-    public void insertRowTodo(ISqlJetTable table, int id, String text, String archive) throws SqlJetException{
-        table.insert(id, text, archive);
+    public void insertRowTodo(ISqlJetTable table, int id, String text) throws SqlJetException{
+        table.insert(id, text);
     }
     
-    public void insertRowDone(ISqlJetTable table, int id, String text, String archive, boolean langDe) throws SqlJetException{
-        table.insert(id, text, archive, langDe);
+    public void insertRowDone(ISqlJetTable table, int id, String text, boolean langDe) throws SqlJetException{
+        table.insert(id, text, langDe);
     }
 
 }
