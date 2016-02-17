@@ -1,5 +1,6 @@
 package de.uni_koeln.spinfo.ang.util;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,9 +9,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 public class IO {
+	
 	
 	public static String readFile(String path){
 		StringBuilder sb = new StringBuilder();
@@ -30,32 +32,32 @@ public class IO {
 		return sb.toString();
 	}
 	
+	
 	public static BufferedReader getFileReader(String filePath){
 		try {
 			return new BufferedReader(
 					new InputStreamReader(
 							   new FileInputStream(
-									   new File(filePath)), "UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+									   new File(filePath)), StandardCharsets.UTF_8));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 	
+	
 	public static OutputStreamWriter getFileWriter(String filePath){
 		try {
 			return new OutputStreamWriter(
-						   new FileOutputStream(
-								   new File(filePath)), "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+						   new BufferedOutputStream(
+							   new FileOutputStream(
+								   new File(filePath))), StandardCharsets.UTF_8);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
+	
 	
 	public static boolean deleteFile(String path){
 		File f = new File(path);
@@ -66,4 +68,5 @@ public class IO {
 		return true;
 	}
 
+	
 }

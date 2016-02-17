@@ -2,8 +2,9 @@ package de.uni_koeln.spinfo.ang.benchmark;
 
 public class SimpleBenchmark {
 	
-	public static final String ERR_NOT_RUNNING = "[BMARK]\tError: No benchmark running";
-	public static final String ERR_RUNNING = "[BMARK]\tError: Benchmark currently running";
+	private static final String ERROR_NOT_RUNNING 	= "[BMARK]\tError: No benchmark running";
+	private static final String ERROR_RUNNING 		= "[BMARK]\tError: Benchmark currently running";
+	private static final String INFO_START			= "[BMARK]\tStarting new benchmark: ";
 	
 	private long startTime;
 	private long stopTime;
@@ -14,10 +15,11 @@ public class SimpleBenchmark {
 	
 	public void startNewBenchmark(String benchmarkTitle){
 		if (running){
-			System.err.println(ERR_RUNNING + " \"" + benchmarkTitle + "\"");
+			System.err.println(ERROR_RUNNING + " \"" + benchmarkTitle + "\"");
 			return;
 		}
 		
+		System.out.println(INFO_START + benchmarkTitle);
 		running = true;
 		stepCount = 0;
 		stopTime = 0;
@@ -30,7 +32,7 @@ public class SimpleBenchmark {
 		stopTime = System.currentTimeMillis();
 		
 		if (!running){
-			System.err.println(ERR_NOT_RUNNING);
+			System.err.println(ERROR_NOT_RUNNING);
 			return null;
 		}
 		
@@ -41,7 +43,7 @@ public class SimpleBenchmark {
 	
 	public void newStep(){
 		if (!running){
-			System.err.println(ERR_NOT_RUNNING);
+			System.err.println(ERROR_NOT_RUNNING);
 			return;
 		}
 		stepCount++;

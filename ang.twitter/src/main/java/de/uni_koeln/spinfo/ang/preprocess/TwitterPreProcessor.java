@@ -27,14 +27,14 @@ public class TwitterPreProcessor {
 	
 	
 	public BenchmarkData process(String path){
+		bMark.startNewBenchmark("pre-processing of " + path);
 		path = cleanFile(path);
 		BufferedReader br = IO.getFileReader(path);
 		String jsonObject;
 		JsonFactory factory = new JsonFactory();
 		IGermanDetector deDetector = new TikaGermanDetector();
 		
-		System.out.print("[PREPROCESSING]\t" + path + " ...");
-		bMark.startNewBenchmark("pre-processing of " + path);
+		System.out.print("[PRCSS]\t" + path + " ...");
 		
 		try {
 			while ((jsonObject = br.readLine()) != null){
@@ -84,7 +84,7 @@ public class TwitterPreProcessor {
 	
 	
 	private String cleanFile(String path){
-		System.out.print("[CLEANING]\t" + path + " ...");
+		System.out.print("[CLEAN]\t" + path + " ...");
 		String outPath = path + ".tmp";
 		
 		try {
