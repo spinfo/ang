@@ -20,10 +20,10 @@ import com.fasterxml.jackson.core.JsonParseException;
 import de.uni_koeln.spinfo.ang.benchmark.BenchmarkData;
 import de.uni_koeln.spinfo.ang.benchmark.SimpleBenchmark;
 import de.uni_koeln.spinfo.ang.langdetect.IGermanDetector;
-import de.uni_koeln.spinfo.ang.langdetect.TikaGermanDetector;
+import de.uni_koeln.spinfo.ang.langdetect.LangDetectGermanDetector;
 
 
-public class TwitterJsonPreProcessing {
+public class TwitterJsonPreProcessingOld {
 	
 //	private StringRangeScanner srs;
 	private SimpleBenchmark bMark;
@@ -43,7 +43,7 @@ public class TwitterJsonPreProcessing {
 	private static final String FILE_PATH     = "/Users/bkiss/Documents/testdata/test.json";
 	
 	public static void main(String[] args) {
-		TwitterJsonPreProcessing pre = new TwitterJsonPreProcessing();
+		TwitterJsonPreProcessingOld pre = new TwitterJsonPreProcessingOld();
 		
 		try {
 			pre.preProcess(FILE_PATH).printReport();
@@ -73,9 +73,9 @@ public class TwitterJsonPreProcessing {
 		JsonSurfer surfer = new JsonSurfer(JacksonParser.INSTANCE, JavaCollectionProvider.INSTANCE);
         SurfingConfiguration config = surfer.configBuilder().bind("$.text", new JsonPathListener() {
                 	private int count = 0;
-                	private IGermanDetector detector = new TikaGermanDetector();
+//                	private IGermanDetector detector = new TikaGermanDetector();
 //                	private IGermanDetector detector = new NaiveGermanDetector();
-//                	private IGermanDetector detector = new LangDetectGermanDetector();
+                	private IGermanDetector detector = new LangDetectGermanDetector();
 //                	private IGermanDetector detector = new StopWordsGermanDetector();
                 	
                     @Override
