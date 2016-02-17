@@ -4,8 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 
 public class IO {
@@ -14,7 +16,7 @@ public class IO {
 		StringBuilder sb = new StringBuilder();
 
 		try {
-			BufferedReader in = getReader(path);
+			BufferedReader in = getFileReader(path);
 			String str;
 			      
 			while ((str = in.readLine()) != null) {
@@ -28,12 +30,25 @@ public class IO {
 		return sb.toString();
 	}
 	
-	public static BufferedReader getReader(String filePath){
+	public static BufferedReader getFileReader(String filePath){
 		try {
 			return new BufferedReader(
 					new InputStreamReader(
 							   new FileInputStream(
-									   new File(filePath)), "UTF8"));
+									   new File(filePath)), "UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public static OutputStreamWriter getFileWriter(String filePath){
+		try {
+			return new OutputStreamWriter(
+						   new FileOutputStream(
+								   new File(filePath)), "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {

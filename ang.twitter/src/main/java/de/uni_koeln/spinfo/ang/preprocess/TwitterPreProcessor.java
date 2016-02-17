@@ -1,12 +1,9 @@
 package de.uni_koeln.spinfo.ang.preprocess;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
 
@@ -31,13 +28,14 @@ public class TwitterPreProcessor {
 	
 	public BenchmarkData process(String path){
 		path = cleanFile(path);
-		BufferedReader br = IO.getReader(path);
+		BufferedReader br = IO.getFileReader(path);
 		String jsonObject;
 		JsonFactory factory = new JsonFactory();
 		IGermanDetector deDetector = new TikaGermanDetector();
 		
 		System.out.print("[PREPROCESSING]\t" + path + " ...");
 		bMark.startNewBenchmark("pre-processing of " + path);
+		
 		try {
 			while ((jsonObject = br.readLine()) != null){
 				JsonParser parser = factory.createParser(jsonObject);
@@ -78,32 +76,27 @@ public class TwitterPreProcessor {
 	private String normalize(String input){
 		//input = StringEscapeUtils.unescapeJava(input);
 		return Normalizer.normalize(input, Form.NFC)
-				.replaceAll("\n", " ")
 				.replaceAll(Patterns.TWITTER_HASHTAG, "")
 				.replaceAll(Patterns.PATTERN_TWITTER_RETWEET, "")
 				.replaceAll(Patterns.TWITTER_MENTION, "")
 				.replaceAll(Patterns.PATTERN_URL, "");
-//				.replaceAll("[\\x0E-\\x1F]", "");
 	}
 	
 	
 	private String cleanFile(String path){
 		System.out.print("[CLEANING]\t" + path + " ...");
-		File fileIn = new File(path);
-		File fileOut = new File(path + ".tmp");
+		String outPath = path + ".tmp";
 		
 		try {
-			FileReader fr = new FileReader(fileIn);
-			BufferedReader br = new BufferedReader(fr);
-			FileWriter fw = new FileWriter(fileOut);
-			BufferedWriter bw = new BufferedWriter(fw);
+			BufferedReader br = IO.getFileReader(path);
+			OutputStreamWriter bw = IO.getFileWriter(outPath);
 			String line;
 			
 			//skip lines without json data and lines not tagged "de"
 			//then clean lines from invalid chars etc.
 			while ((line = br.readLine()) != null) {
 				if (!line.matches(Patterns.PATTERN_JSON_OBJECT_LANG_DE)) continue;
-				line = cleanString(line);
+				line = cleanStringFromInvalidChars(line);
 				bw.write(line);
 				bw.write("\n");
 			}
@@ -117,13 +110,14 @@ public class TwitterPreProcessor {
 			e.printStackTrace();
 		}
 		System.out.println(" DONE");
-		return fileOut.getAbsolutePath();
+		return outPath;
 	}
 	
 	
-	private String cleanString(String string){
-		return string.replaceAll("[\\x11-\\x14]", "")
-				.replaceAll(Patterns.PATTERN_INCOMPLETE_UNICODE, "");
+	private String cleanStringFromInvalidChars(String string){
+		return string.replaceAll(Patterns.PATTERN_CONTROL_CHARS, "")
+			      	 .replaceAll(Patterns.PATTERN_INCOMPLETE_UNICODE, "")
+					 .replaceAll("\n", " ");
 	}
 
 }
