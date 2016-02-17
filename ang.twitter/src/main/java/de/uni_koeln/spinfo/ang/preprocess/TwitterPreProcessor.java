@@ -1,6 +1,7 @@
 package de.uni_koeln.spinfo.ang.preprocess;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -8,6 +9,7 @@ import java.text.Normalizer;
 import java.text.Normalizer.Form;
 
 import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 
 import de.uni_koeln.spinfo.ang.benchmark.BenchmarkData;
@@ -28,13 +30,14 @@ public class TwitterPreProcessor {
 	
 	public BenchmarkData process(String path){
 		bMark.startNewBenchmark("pre-processing of " + path);
-		path = cleanFile(path);
-		BufferedReader br = IO.getFileReader(path);
+		String tempPath = cleanFile(path);
+		BufferedReader br = IO.getFileReader(tempPath);
 		String jsonObject;
 		JsonFactory factory = new JsonFactory();
 		IGermanDetector deDetector = new TikaGermanDetector();
 		
-		System.out.print("[PRCSS]\t" + path + " ...");
+		System.out.print("[PRCSS]\t" + tempPath + " ...");
+		long id = 0;
 		
 		try {
 			while ((jsonObject = br.readLine()) != null){
@@ -51,6 +54,20 @@ public class TwitterPreProcessor {
 							//TODO process
 							//System.out.println("text = " + text);
 							
+							//make output directory
+							File dir = new File(path + "_output" + File.separator);
+							dir.mkdir();
+							
+							JsonGenerator g = factory.createGenerator(
+									IO.getFileWriter(dir.getAbsolutePath() 
+											+ File.separator 
+											+ id++ + ".json"));
+
+							g.writeStartObject();
+							g.writeStringField("text", text);
+							g.writeEndObject();
+							g.close();
+							
 							//benchmark step
 							bMark.newStep();
 							
@@ -66,7 +83,7 @@ public class TwitterPreProcessor {
 		}
 		
 		//delete temp file
-		IO.deleteFile(path);
+		IO.deleteFile(tempPath);
 		
 		System.out.println(" DONE");
 		return bMark.stopBenchMark();
