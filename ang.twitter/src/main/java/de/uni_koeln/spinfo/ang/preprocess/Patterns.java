@@ -11,5 +11,6 @@ public class Patterns {
 	public static final String PATTERN_JSON_OBJECT 			= "^\\{.*\\}$";
 	public static final String PATTERN_JSON_OBJECT_LANG_DE 	= "^.*\\\"lang\\\"\\:\\\"de\\\".*$";
 	public static final String PATTERN_WORD_BOUNDARY 		= "\\P{L}";
+	public static final String PATTERN_INCOMPLETE_UNICODE 	= "\\\\u[0-9A-Fa-f]{0,3}[^0-9A-Fa-f]";
 
 }
