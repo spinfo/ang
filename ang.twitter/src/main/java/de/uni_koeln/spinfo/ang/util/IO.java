@@ -47,11 +47,11 @@ public class IO {
 	
 	
 	public static OutputStreamWriter getFileWriter(String filePath){
+		File f = new File(filePath);
 		try {
 			return new OutputStreamWriter(
-						   new BufferedOutputStream(
-							   new FileOutputStream(
-								   new File(filePath))), StandardCharsets.UTF_8);
+					   new BufferedOutputStream(
+						   new FileOutputStream(f)), StandardCharsets.UTF_8);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
