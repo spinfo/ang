@@ -122,7 +122,8 @@ public class TwitterPreProcessor {
 	
 	
 	private String cleanString(String string){
-		return string.replaceAll("[\\x11-\\x14]", "");
+		return string.replaceAll("[\\x11-\\x14]", "")
+				.replaceAll(Patterns.PATTERN_INCOMPLETE_UNICODE, "");
 	}
 
 }
