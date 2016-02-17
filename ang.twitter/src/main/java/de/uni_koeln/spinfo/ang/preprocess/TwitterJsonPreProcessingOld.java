@@ -32,7 +32,6 @@ public class TwitterJsonPreProcessingOld {
 	
 	private static final String PATTERN_START = "\\{\\\"created_at\\\"\\:.+\\\"text\\\"\\:\\\"";
 	private static final String PATTERN_END   = "(?<!\\\\)\\\"";
-	
 	private static final String PATTERN_TWITTER_MENTION = "(?<=^|(?<=[^a-zA-Z0-9-\\.]))@([A-Za-z0-9_]+)([^a-zA-Z0-9_]|$)";
 	private static final String PATTERN_TWITTER_HASHTAG = "(?<=^|(?<=[^a-zA-Z0-9-_\\.]))#([A-Za-z]+[A-Za-z0-9_]+)";
 	private static final String PATTERN_TWITTER_RETWEET = "RT\\s" + PATTERN_TWITTER_MENTION + "\\s";
