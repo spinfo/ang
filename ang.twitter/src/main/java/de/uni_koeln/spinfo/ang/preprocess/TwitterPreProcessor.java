@@ -70,6 +70,8 @@ public class TwitterPreProcessor {
 							g.writeEndObject();
 							g.close();
 							
+							//System.out.println(text);
+							
 							//benchmark step
 							bMark.newStep();
 							
