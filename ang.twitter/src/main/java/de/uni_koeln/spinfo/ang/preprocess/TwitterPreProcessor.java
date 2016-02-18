@@ -43,14 +43,16 @@ public class TwitterPreProcessor {
 			while ((jsonObject = br.readLine()) != null){
 				JsonParser parser = factory.createParser(jsonObject);
 				String text;
+				String textCleaned;
 				
 				//parse json object
 				while(!parser.isClosed()){
 					String fieldName = parser.nextFieldName();
 					if (fieldName != null && fieldName.equals("text")){
-						if ((text = normalize(parser.nextTextValue()))
-								.matches(Patterns.PATTERN_HAS_LATIN_CHARS)
-								&& deDetector.isGerman(text)){
+						text = normalize(parser.nextTextValue());
+						textCleaned = cleanTweet(text);
+						if (textCleaned.matches(Patterns.PATTERN_HAS_LATIN_CHARS)
+								&& deDetector.isGerman(textCleaned)){
 							//TODO process
 							//System.out.println("text = " + text);
 							
@@ -91,8 +93,12 @@ public class TwitterPreProcessor {
 	
 	
 	private String normalize(String input){
-		//input = StringEscapeUtils.unescapeJava(input);
-		return Normalizer.normalize(input, Form.NFC)
+		return Normalizer.normalize(input, Form.NFC);
+	}
+	
+	
+	private String cleanTweet(String input){
+		return input
 				.replaceAll(Patterns.TWITTER_HASHTAG, "")
 				.replaceAll(Patterns.PATTERN_TWITTER_RETWEET, "")
 				.replaceAll(Patterns.TWITTER_MENTION, "")
