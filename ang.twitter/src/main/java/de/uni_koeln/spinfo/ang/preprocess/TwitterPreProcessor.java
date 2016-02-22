@@ -7,10 +7,13 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.uni_koeln.spinfo.ang.benchmark.BenchmarkData;
 import de.uni_koeln.spinfo.ang.benchmark.SimpleBenchmark;
@@ -31,6 +34,7 @@ public class TwitterPreProcessor {
 	public BenchmarkData process(String path){
 		bMark.startNewBenchmark("pre-processing of " + path);
 		String tempPath = cleanFile(path);
+		String fileName = path.substring(path.lastIndexOf('/')+1);
 		BufferedReader br = IO.getFileReader(tempPath);
 		String jsonObject;
 		JsonFactory factory = new JsonFactory();
@@ -41,46 +45,76 @@ public class TwitterPreProcessor {
 		
 		try {
 			while ((jsonObject = br.readLine()) != null){
-				JsonParser parser = factory.createParser(jsonObject);
-				String text;
-				String textCleaned;
+//				JsonParser parser = factory.createParser(jsonObject);
+				ObjectMapper mapper = new ObjectMapper();
+				Map<String, Object> map = new HashMap<String, Object>();
+				map = mapper.readValue(jsonObject, new TypeReference<Map<String, Object>>(){});
 				
-				//parse json object
-				while(!parser.isClosed()){
-					String fieldName = parser.nextFieldName();
-					if (fieldName != null && fieldName.equals("text")){
-						text = normalize(parser.nextTextValue());
-						textCleaned = cleanTweet(text);
-						if (textCleaned.matches(Patterns.PATTERN_HAS_LATIN_CHARS)
-								&& deDetector.isGerman(textCleaned)){
-							//TODO process
-							//System.out.println("text = " + text);
-							
-							//make output directory
-							File dir = new File(path + "_output" + File.separator);
-							dir.mkdir();
-							
-							JsonGenerator g = factory.createGenerator(
-									IO.getFileWriter(dir.getAbsolutePath() 
-											+ File.separator 
-											+ id++ + ".json"));
+				String text = (String) map.get("text");
+				String textCleaned = cleanTweet(text);
+				
+				if (textCleaned.matches(Patterns.PATTERN_HAS_LATIN_CHARS)
+						&& deDetector.isGerman(textCleaned)){
+					
+					//make output directory
+					File dir = new File(path + "_output" + File.separator);
+					if (!dir.exists()) dir.mkdir();
+					
+					JsonGenerator g = factory.createGenerator(
+							IO.getFileWriter(dir.getAbsolutePath() 
+									+ File.separator 
+									+ id++ + ".json"));
 
-							g.writeStartObject();
-							g.writeStringField("text", text);
-							g.writeEndObject();
-							g.close();
-							
-							//System.out.println(text);
-							
-							//benchmark step
-							bMark.newStep();
-							
-							//abort processing for this object (text found)
-							parser.close();
-							break;
-						}
-					}
+					g.writeStartObject();
+					g.writeStringField("text", text);
+					g.writeStringField("text_clean", textCleaned);
+					g.writeStringField("id", "twitter-" + (String)map.get("id_str"));
+					g.writeStringField("date", (String)map.get("created_at"));
+					g.writeStringField("source", "twitter");
+					g.writeStringField("source_file", fileName);
+					g.writeEndObject();
+					g.close();
+					//benchmark step
+					bMark.newStep();
 				}
+				
+				
+//				//parse json object
+//				while(!parser.isClosed()){
+//					String fieldName = parser.nextFieldName();
+//					if (fieldName != null && fieldName.equals("text")){
+//						text = normalize(parser.nextTextValue());
+//						textCleaned = cleanTweet(text);
+//						if (textCleaned.matches(Patterns.PATTERN_HAS_LATIN_CHARS)
+//								&& deDetector.isGerman(textCleaned)){
+//							//TODO process
+//							//System.out.println("text = " + text);
+//							
+//							//make output directory
+//							File dir = new File(path + "_output" + File.separator);
+//							dir.mkdir();
+//							
+//							JsonGenerator g = factory.createGenerator(
+//									IO.getFileWriter(dir.getAbsolutePath() 
+//											+ File.separator 
+//											+ id++ + ".json"));
+//
+//							g.writeStartObject();
+//							g.writeStringField("text", text);
+//							g.writeEndObject();
+//							g.close();
+//							
+////							System.out.println(text);
+//							
+//							//benchmark step
+//							bMark.newStep();
+//							
+//							//abort processing for this object (text found)
+//							parser.close();
+//							break;
+//						}
+//					}
+//				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
