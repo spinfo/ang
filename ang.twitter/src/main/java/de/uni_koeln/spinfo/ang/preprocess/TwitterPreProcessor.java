@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.uni_koeln.spinfo.ang.benchmark.BenchmarkData;
 import de.uni_koeln.spinfo.ang.benchmark.SimpleBenchmark;
-import de.uni_koeln.spinfo.ang.data.CorpusObjectFields;
+import de.uni_koeln.spinfo.ang.data.CorpusObjectField;
 import de.uni_koeln.spinfo.ang.langdetect.IGermanDetector;
 import de.uni_koeln.spinfo.ang.langdetect.TikaGermanDetector;
 import de.uni_koeln.spinfo.ang.util.FormatConvert;
@@ -65,20 +65,20 @@ public class TwitterPreProcessor {
 									+ id++ + ".json"));
 
 					g.writeStartObject();
-					g.writeStringField(CorpusObjectFields.TEXT, text);
-					g.writeStringField(CorpusObjectFields.ID, "twitter-" + map.get("id_str").toString());
-					g.writeStringField(CorpusObjectFields.DATE_YEAR, map.get("created_at").toString()
+					g.writeStringField(CorpusObjectField.TEXT.v(), text);
+					g.writeStringField(CorpusObjectField.ID.v(), "twitter-" + map.get("id_str").toString());
+					g.writeStringField(CorpusObjectField.DATE_YEAR.v(), map.get("created_at").toString()
 							.replaceAll(".+(?=" + Patterns.DATE_YEAR + ")", "")
 							.replaceAll("(?<=" + Patterns.DATE_YEAR + ").+", ""));
-					g.writeStringField(CorpusObjectFields.DATE_MONTH,
+					g.writeStringField(CorpusObjectField.DATE_MONTH.v(),
 							FormatConvert.monthWordShortToNumber(
 								map.get("created_at").toString()
 								.replaceAll(".+(?=" + Patterns.DATE_MONTH_WORD_SHORT + ")", "")
 								.replaceAll("(?<=" + Patterns.DATE_MONTH_WORD_SHORT + ").+", ""))+"");
-					g.writeStringField(CorpusObjectFields.SOURCE, "twitter");
-					g.writeStringField(CorpusObjectFields.SOURCE_FILE, fileName);
-					g.writeStringField(CorpusObjectFields.SOURCE_ARCHIVE, fileName + ".gz");
-					g.writeStringField(CorpusObjectFields.LENGTH, text.length()+"");
+					g.writeStringField(CorpusObjectField.SOURCE.v(), "twitter");
+					g.writeStringField(CorpusObjectField.SOURCE_FILE.v(), fileName);
+					g.writeStringField(CorpusObjectField.SOURCE_ARCHIVE.v(), fileName + ".gz");
+					g.writeStringField(CorpusObjectField.LENGTH.v(), text.length()+"");
 					g.writeEndObject();
 					g.close();
 					//benchmark step

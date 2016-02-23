@@ -8,6 +8,7 @@ public class Main {
 		TwitterPreProcessor proc = new TwitterPreProcessor();
 		BenchmarkData bMarkData = proc.process("/Users/bkiss/Documents/testdata/test.json");
 		System.out.println(bMarkData);
+		
 	}
 
 }
