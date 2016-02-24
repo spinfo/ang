@@ -86,7 +86,7 @@ public class TwitterJsonPreProcessingOld {
             			//german language detection test
             			if (detector.isGerman(s)){
             				System.out.println("DE\t" + s);
-            				bMark.newStep();
+            				bMark.newMarker();
             			}
                     }
                 }).build();

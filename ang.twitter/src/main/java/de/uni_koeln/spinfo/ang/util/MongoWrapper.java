@@ -11,15 +11,14 @@ import de.uni_koeln.spinfo.ang.data.CorpusObject;
 
 public class MongoWrapper {
 	
-	MongoClient mongoClient;
-	MongoDatabase database;
-	MongoCollection<Document> coll;
+	private MongoClient mongoClient;
+	private MongoDatabase database;
+	private MongoCollection<Document> coll;
 
 	
 	public MongoWrapper(){
 		
 	}
-	
 	
 	public void init(String user,
 			String pass,

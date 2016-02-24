@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class IO {
 	
@@ -66,6 +69,39 @@ public class IO {
 			return false;
 		}
 		return true;
+	}
+	
+	
+	public static Set<File> getAllFiles(String directoryPath, String fileNamePattern){
+		SortedSet<File> files = new TreeSet<File>();
+		File dir = new File(directoryPath);
+		
+		if (!dir.exists() || !dir.isDirectory()){
+			System.out.println("[IOERR]\t" + directoryPath
+					+ " doesn't exist or is not a directory!");
+			return files;
+		}
+		
+        return getAllFiles(files, dir, fileNamePattern);
+	}
+	
+	
+	private static Set<File> getAllFiles(Set<File> files, File dir, String fileNamePattern){
+        File[] list = dir.listFiles();
+
+        if (list == null) return files;
+
+        for (File f : list) {
+            if (f.isDirectory()) {
+                files = getAllFiles(files, f, fileNamePattern);
+            } else {
+                if (fileNamePattern == null || fileNamePattern.length() == 0)
+                	files.add(f);
+                else if (f.getName().matches(fileNamePattern))
+                	files.add(f);
+            }
+        }
+        return files;
 	}
 
 	

@@ -14,34 +14,37 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.uni_koeln.spinfo.ang.benchmark.BenchmarkData;
 import de.uni_koeln.spinfo.ang.benchmark.SimpleBenchmark;
+import de.uni_koeln.spinfo.ang.data.CorpusObject;
 import de.uni_koeln.spinfo.ang.data.CorpusObjectField;
 import de.uni_koeln.spinfo.ang.langdetect.IGermanDetector;
 import de.uni_koeln.spinfo.ang.langdetect.TikaGermanDetector;
 import de.uni_koeln.spinfo.ang.util.FormatConvert;
 import de.uni_koeln.spinfo.ang.util.IO;
+import de.uni_koeln.spinfo.ang.util.MongoWrapper;
 
 public class TwitterPreProcessor {
 	
 	private SimpleBenchmark bMark;
+	private MongoWrapper mongo;
 	
 	
-	public TwitterPreProcessor(){
+	public TwitterPreProcessor(MongoWrapper mongo){
 		bMark = new SimpleBenchmark();
+		this.mongo = mongo;
 	}
 	
 	
-	public BenchmarkData process(String path){
-		bMark.startNewBenchmark("pre-processing of " + path);
-//		String tempPath = cleanFile(path);
-		String fileName = path.substring(path.lastIndexOf('/')+1);
+	public BenchmarkData process(File file){
+		String path = file.getAbsolutePath();
+		bMark.startNewBenchmark("processing of " + file.getName());
+		String fileName = file.getName();
 		BufferedReader br = IO.getFileReader(path);
 		String jsonObject;
-		JsonFactory factory = new JsonFactory();
+//		JsonFactory factory = new JsonFactory();
 		IGermanDetector deDetector = new TikaGermanDetector();
 		Map<String, Object> map;
 		
-		System.out.print("[PRCSS]\t" + path + " ...");
-		long id = 0;
+		System.out.println("[PRCSS]\t" + path + " ...");
 		
 		try {
 			while ((jsonObject = br.readLine()) != null){
@@ -55,34 +58,50 @@ public class TwitterPreProcessor {
 				if (textCleaned.matches(Patterns.HAS_LATIN_CHARS)
 						&& deDetector.isGerman(textCleaned)){
 					
-					//make output directory
-					File dir = new File(path + "_output" + File.separator);
-					if (!dir.exists()) dir.mkdir();
+					CorpusObject corpusObject = new CorpusObject();
+					corpusObject.addData(CorpusObjectField.TEXT_STRING, text);
+					corpusObject.addData(CorpusObjectField.ID_STRING,
+							"twitter-" + map.get("id_str").toString());
+					corpusObject.addData(CorpusObjectField.DATE_YEAR_INT,
+							FormatConvert.yearFromTwitterDateString(
+									map.get("created_at").toString()));
+					corpusObject.addData(CorpusObjectField.DATE_MONTH_INT,
+							FormatConvert.monthFromTwitterDateString(
+									map.get("created_at").toString()));
+					corpusObject.addData(CorpusObjectField.SOURCE_STRING, "twitter");
+					corpusObject.addData(CorpusObjectField.SOURCE_FILE_STRING, fileName);
+					corpusObject.addData(CorpusObjectField.SOURCE_ARCHIVE_STRING, fileName + ".gz");
+					corpusObject.addData(CorpusObjectField.LENGTH_INT, text.length());
 					
-					JsonGenerator g = factory.createGenerator(
-							IO.getFileWriter(dir.getAbsolutePath() 
-									+ File.separator 
-									+ id++ + ".json"));
-
-					g.writeStartObject();
-					g.writeStringField(CorpusObjectField.TEXT.v(), text);
-					g.writeStringField(CorpusObjectField.ID.v(), "twitter-" + map.get("id_str").toString());
-					g.writeStringField(CorpusObjectField.DATE_YEAR.v(), map.get("created_at").toString()
-							.replaceAll(".+(?=" + Patterns.DATE_YEAR + ")", "")
-							.replaceAll("(?<=" + Patterns.DATE_YEAR + ").+", ""));
-					g.writeStringField(CorpusObjectField.DATE_MONTH.v(),
-							FormatConvert.monthWordShortToNumber(
-								map.get("created_at").toString()
-								.replaceAll(".+(?=" + Patterns.DATE_MONTH_WORD_SHORT + ")", "")
-								.replaceAll("(?<=" + Patterns.DATE_MONTH_WORD_SHORT + ").+", ""))+"");
-					g.writeStringField(CorpusObjectField.SOURCE.v(), "twitter");
-					g.writeStringField(CorpusObjectField.SOURCE_FILE.v(), fileName);
-					g.writeStringField(CorpusObjectField.SOURCE_ARCHIVE.v(), fileName + ".gz");
-					g.writeStringField(CorpusObjectField.LENGTH.v(), text.length()+"");
-					g.writeEndObject();
-					g.close();
+					mongo.addDocument(corpusObject);
+					
+					//make output directory
+//					File dir = new File(path + "_output" + File.separator);
+//					if (!dir.exists()) dir.mkdir();
+//					
+//					JsonGenerator g = factory.createGenerator(
+//							IO.getFileWriter(dir.getAbsolutePath() 
+//									+ File.separator 
+//									+ map.get("id_str") + ".json"));
+//
+//					g.writeStartObject();
+//					g.writeStringField(CorpusObjectField.TEXT.v(), text);
+//					g.writeStringField(CorpusObjectField.ID.v(),
+//							"twitter-" + map.get("id_str").toString());
+//					g.writeStringField(CorpusObjectField.DATE_YEAR.v(),
+//							FormatConvert.yearFromTwitterDateString(
+//									map.get("created_at").toString())+"");
+//					g.writeStringField(CorpusObjectField.DATE_MONTH.v(),
+//							FormatConvert.monthFromTwitterDateString(
+//									map.get("created_at").toString())+"");
+//					g.writeStringField(CorpusObjectField.SOURCE.v(), "twitter");
+//					g.writeStringField(CorpusObjectField.SOURCE_FILE.v(), fileName);
+//					g.writeStringField(CorpusObjectField.SOURCE_ARCHIVE.v(), fileName + ".gz");
+//					g.writeStringField(CorpusObjectField.LENGTH.v(), text.length()+"");
+//					g.writeEndObject();
+//					g.close();
 					//benchmark step
-					bMark.newStep();
+					bMark.newMarker();
 				}
 				
 				
@@ -93,8 +112,6 @@ public class TwitterPreProcessor {
 		
 		//delete temp file
 //		IO.deleteFile(tempPath);
-		
-		System.out.println(" DONE");
 		return bMark.stopBenchMark();
 	}
 	

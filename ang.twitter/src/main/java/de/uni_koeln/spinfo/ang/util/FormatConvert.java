@@ -1,5 +1,7 @@
 package de.uni_koeln.spinfo.ang.util;
 
+import de.uni_koeln.spinfo.ang.preprocess.Patterns;
+
 public class FormatConvert {
 	
 	public static int monthWordShortToNumber(String month){
@@ -17,6 +19,18 @@ public class FormatConvert {
 		else if (month.equals("NOV")) return 11;
 		else if (month.equals("DEZ")) return 12;
 		else return -1;
+	}
+	
+	public static int yearFromTwitterDateString(String date){
+		return Integer.parseInt(
+				date.replaceAll(".+(?=" + Patterns.DATE_YEAR + ")", "")
+					.replaceAll("(?<=" + Patterns.DATE_YEAR + ").+", ""));
+	}
+	
+	public static int monthFromTwitterDateString(String date){
+		return monthWordShortToNumber(
+				date.replaceAll(".+(?=" + Patterns.DATE_MONTH_WORD_SHORT + ")", "")
+					.replaceAll("(?<=" + Patterns.DATE_MONTH_WORD_SHORT + ").+", ""));
 	}
 
 }
