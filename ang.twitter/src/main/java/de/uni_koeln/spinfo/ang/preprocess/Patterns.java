@@ -15,5 +15,6 @@ public class Patterns {
 	public static final String CONTROL_CHARS	 		= "[\\x11-\\x14]";
 	public static final String DATE_YEAR		 		= "(18|19|20)\\d\\d";
 	public static final String DATE_MONTH_WORD_SHORT	= "(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dez)";
+	public static final String TWITTER_JSON_FILES		= ".+\\.(json|geo)";
 
 }
