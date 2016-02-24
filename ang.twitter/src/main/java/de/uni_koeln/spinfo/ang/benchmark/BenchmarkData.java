@@ -5,15 +5,15 @@ public class BenchmarkData {
 	private String title;
 	private long startTime;
 	private long stopTime;
-	private long stepCount;
+	private long markers;
 	
 	
-	public BenchmarkData(String title, long startTime, long stopTime, long stepCount) {
+	public BenchmarkData(String title, long startTime, long stopTime, long markers) {
 		super();
 		this.title = title;
 		this.startTime = startTime;
 		this.stopTime = stopTime;
-		this.stepCount = stepCount;
+		this.markers = markers;
 	}
 	
 	
@@ -30,7 +30,19 @@ public class BenchmarkData {
 	@Override
 	public String toString(){
 		return "[BMARK]\tBenchmark \"" + title + "\" finished in "
-				+ (float)((float)(stopTime - startTime)/(float)1000) + " seconds (" + stepCount + " steps).";
+				+ getReadableTimeString((float)(stopTime - startTime)) + " (" + markers + " markers set).";
+	}
+	
+	
+	public String getRecordedTimeAsString(){
+		return getReadableTimeString((float)(stopTime - startTime));
+	}
+	
+	
+	private String getReadableTimeString(float millis){
+		float sec = millis / (float)1000;
+		if (sec > 60) return sec/(float)60 + " min.";
+		else return sec + " sec.";
 	}
 
 
@@ -49,8 +61,8 @@ public class BenchmarkData {
 	}
 
 
-	public long getStepCount() {
-		return stepCount;
+	public long getMarkerCount() {
+		return markers;
 	}
 	
 }

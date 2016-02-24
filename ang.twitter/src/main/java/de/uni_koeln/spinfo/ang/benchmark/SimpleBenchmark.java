@@ -8,7 +8,7 @@ public class SimpleBenchmark {
 	
 	private long startTime;
 	private long stopTime;
-	private long stepCount;
+	private long markerCount;
 	private String benchmarkTitle;
 	private boolean running;
 	
@@ -21,7 +21,7 @@ public class SimpleBenchmark {
 		
 		System.out.println(INFO_START + benchmarkTitle);
 		running = true;
-		stepCount = 0;
+		markerCount = 0;
 		stopTime = 0;
 		this.benchmarkTitle = benchmarkTitle;
 		startTime = System.currentTimeMillis();
@@ -37,15 +37,15 @@ public class SimpleBenchmark {
 		}
 		
 		running = false;
-		return new BenchmarkData(benchmarkTitle, startTime, stopTime, stepCount);
+		return new BenchmarkData(benchmarkTitle, startTime, stopTime, markerCount);
 	}
 
 	
-	public void newStep(){
+	public void newMarker(){
 		if (!running){
 			System.err.println(ERROR_NOT_RUNNING);
 			return;
 		}
-		stepCount++;
+		markerCount++;
 	}
 }
