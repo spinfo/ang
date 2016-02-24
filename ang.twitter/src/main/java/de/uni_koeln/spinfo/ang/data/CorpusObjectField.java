@@ -2,19 +2,21 @@ package de.uni_koeln.spinfo.ang.data;
 
 public enum CorpusObjectField {
 	
-	ID ("id"),
-	TEXT ("text"),
-	SOURCE ("source"),
-	SOURCE_ARCHIVE ("source_archive"),
-	SOURCE_FILE ("source_file"),
-	DATE_YEAR ("date_year"),
-	DATE_MONTH ("date_month"),
-	LENGTH ("length");
+	ID_STRING ("id", String.class),
+	TEXT_STRING ("text", String.class),
+	SOURCE_STRING ("source", String.class),
+	SOURCE_ARCHIVE_STRING ("source_archive", String.class),
+	SOURCE_FILE_STRING ("source_file", String.class),
+	DATE_YEAR_INT ("date_year", int.class),
+	DATE_MONTH_INT ("date_month", int.class),
+	LENGTH_INT ("length", int.class);
 	
 	private String value;
+	private Class<?> type;
 	
-	private CorpusObjectField(String s){
-		value = s;
+	private CorpusObjectField(String value, Class<?> type){
+		this.value = value;
+		this.type = type;
 	}
 	
 	@Override
@@ -28,6 +30,10 @@ public enum CorpusObjectField {
 	
 	public String v(){
 		return value;
+	}
+	
+	public Class<?> getType(){
+		return type;
 	}
 	
 }

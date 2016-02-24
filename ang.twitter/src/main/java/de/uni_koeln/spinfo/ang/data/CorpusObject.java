@@ -13,7 +13,12 @@ public class CorpusObject {
 		data = new HashMap<String, Object>();
 	}
 	
-	public void addData(CorpusObjectField fieldKey, String data){
+	public void addData(CorpusObjectField fieldKey, Object data){
+		if (!data.getClass().equals(fieldKey.getClass())){
+			System.err.println("[ERROR]\tdata \"" + data.toString()
+			+ "\" added to CorpusObject instance has wrong type (should be "
+					+ fieldKey.getClass() + ")!");
+		}
 		this.data.put(fieldKey.toString(), data);
 	}
 	
