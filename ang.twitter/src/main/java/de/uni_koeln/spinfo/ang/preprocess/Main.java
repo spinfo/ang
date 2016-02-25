@@ -1,7 +1,9 @@
 package de.uni_koeln.spinfo.ang.preprocess;
 
 import java.io.File;
-import java.util.Set;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import de.uni_koeln.spinfo.ang.benchmark.BenchmarkData;
 import de.uni_koeln.spinfo.ang.benchmark.SimpleBenchmark;
@@ -19,7 +21,15 @@ public class Main {
 		
 		SimpleBenchmark bMark = new SimpleBenchmark();
 		bMark.startNewBenchmark("processing of files in " + args[0]);
-		Set<File> files = IO.getAllFiles(args[0], Patterns.TWITTER_JSON_FILES);
+		List<File> files = IO.getAllFiles(args[0], Patterns.TWITTER_JSON_FILES);
+		
+		Collections.sort(files, new Comparator<File>(){
+			@Override
+			public int compare(File o1, File o2) {
+				Long size1 = o1.length();
+				return size1.compareTo(o2.length());
+			}
+		});
 		
 		MongoWrapper mongo = new MongoWrapper();
 		mongo.init("", "", "ang", "localhost", "27017", "angdata");

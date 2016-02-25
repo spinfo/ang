@@ -10,12 +10,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class IO {
-	
 	
 	public static String readFile(String path){
 		StringBuilder sb = new StringBuilder();
@@ -72,8 +71,8 @@ public class IO {
 	}
 	
 	
-	public static Set<File> getAllFiles(String directoryPath, String fileNamePattern){
-		SortedSet<File> files = new TreeSet<File>();
+	public static List<File> getAllFiles(String directoryPath, String fileNamePattern){
+		List<File> files = new ArrayList<File>();
 		File dir = new File(directoryPath);
 		
 		if (!dir.exists() || !dir.isDirectory()){
@@ -86,7 +85,7 @@ public class IO {
 	}
 	
 	
-	private static Set<File> getAllFiles(Set<File> files, File dir, String fileNamePattern){
+	private static List<File> getAllFiles(List<File> files, File dir, String fileNamePattern){
         File[] list = dir.listFiles();
 
         if (list == null) return files;

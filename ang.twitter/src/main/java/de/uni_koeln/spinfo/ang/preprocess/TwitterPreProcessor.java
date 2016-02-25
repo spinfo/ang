@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -40,7 +41,7 @@ public class TwitterPreProcessor {
 		String jsonObject;
 //		JsonFactory factory = new JsonFactory();
 		IGermanDetector deDetector = new TikaGermanDetector();
-		Map<String, Object> map;
+		Map<String, Object> map = new HashMap<String, Object>();
 		
 		System.out.println("[PRCSS]\t" + path + " ...");
 		
@@ -48,7 +49,12 @@ public class TwitterPreProcessor {
 			while ((jsonObject = br.readLine()) != null){
 				if ((jsonObject = getValidatedJsonObject(jsonObject)) == null) continue;
 				ObjectMapper mapper = new ObjectMapper();
-				map = mapper.readValue(jsonObject, new TypeReference<Map<String, Object>>(){});
+				
+				try {
+					map = mapper.readValue(jsonObject, new TypeReference<Map<String, Object>>(){});
+				} catch (Exception e) {
+					continue;
+				}
 				
 				String text = normalize((String)map.get("text"));
 				String textCleaned = cleanTweet(text);
