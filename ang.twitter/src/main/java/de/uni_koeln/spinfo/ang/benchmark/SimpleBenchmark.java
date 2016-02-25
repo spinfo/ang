@@ -48,4 +48,11 @@ public class SimpleBenchmark {
 		}
 		markerCount++;
 	}
+	
+	
+	public long getCurrentMarkerCount(){
+		return markerCount;
+	}
+	
+	
 }
