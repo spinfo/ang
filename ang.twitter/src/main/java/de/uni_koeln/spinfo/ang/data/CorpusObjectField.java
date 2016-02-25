@@ -7,9 +7,9 @@ public enum CorpusObjectField {
 	SOURCE_STRING ("source", String.class),
 	SOURCE_ARCHIVE_STRING ("source_archive", String.class),
 	SOURCE_FILE_STRING ("source_file", String.class),
-	DATE_YEAR_INT ("date_year", int.class),
-	DATE_MONTH_INT ("date_month", int.class),
-	LENGTH_INT ("length", int.class);
+	DATE_YEAR_INT ("date_year", Integer.class),
+	DATE_MONTH_INT ("date_month", Integer.class),
+	LENGTH_INT ("length", Integer.class);
 	
 	private String value;
 	private Class<?> type;

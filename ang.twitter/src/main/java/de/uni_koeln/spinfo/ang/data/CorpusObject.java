@@ -14,10 +14,10 @@ public class CorpusObject {
 	}
 	
 	public void addData(CorpusObjectField fieldKey, Object data){
-		if (!data.getClass().equals(fieldKey.getClass())){
+		if (!data.getClass().equals(fieldKey.getType())){
 			System.err.println("[ERROR]\tdata \"" + data.toString()
 			+ "\" added to CorpusObject instance has wrong type (should be "
-					+ fieldKey.getClass() + ")!");
+					+ fieldKey.getType() + ")!");
 		}
 		this.data.put(fieldKey.toString(), data);
 	}
