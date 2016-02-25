@@ -32,5 +32,17 @@ public class FormatConvert {
 				date.replaceAll(".+(?=" + Patterns.DATE_MONTH_WORD_SHORT + ")", "")
 					.replaceAll("(?<=" + Patterns.DATE_MONTH_WORD_SHORT + ").+", ""));
 	}
+	
+	public static String getReadableDataSize(long bytes){
+		int count = 0;
+		String[] units = {"Bytes","KB","MB","GB","TB"};
+		
+		while (bytes > 1024 && count < 4) {
+			bytes = bytes/1024;
+			count++;
+		}
+		
+		return bytes + " " + units[count];
+	}
 
 }

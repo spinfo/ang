@@ -7,8 +7,6 @@ import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -74,6 +72,8 @@ public class TwitterPreProcessor {
 					corpusObject.addData(CorpusObjectField.LENGTH_INT, text.length());
 					
 					mongo.addDocument(corpusObject);
+					
+//					System.out.println(textCleaned);
 					
 					//make output directory
 //					File dir = new File(path + "_output" + File.separator);

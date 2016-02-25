@@ -5,6 +5,7 @@ import java.util.Set;
 
 import de.uni_koeln.spinfo.ang.benchmark.BenchmarkData;
 import de.uni_koeln.spinfo.ang.benchmark.SimpleBenchmark;
+import de.uni_koeln.spinfo.ang.util.FormatConvert;
 import de.uni_koeln.spinfo.ang.util.IO;
 import de.uni_koeln.spinfo.ang.util.MongoWrapper;
 
@@ -17,7 +18,7 @@ public class Main {
 		}
 		
 		SimpleBenchmark bMark = new SimpleBenchmark();
-		bMark.startNewBenchmark("processing " + args[0]);
+		bMark.startNewBenchmark("processing of files in " + args[0]);
 		Set<File> files = IO.getAllFiles(args[0], Patterns.TWITTER_JSON_FILES);
 		
 		MongoWrapper mongo = new MongoWrapper();
@@ -26,7 +27,10 @@ public class Main {
 		int resultsCount = 0;
 		
 		for (File f : files){
-			System.out.println("\n===== " + f.getName() + " =====");
+			System.out.println("\n===== " + f.getName() + " ("
+					+ FormatConvert.getReadableDataSize(f.length()) + ") [file "
+					+ (bMark.getCurrentMarkerCount()+1)
+					+ "/" + files.size() + "] =====");
 			BenchmarkData subBMarkData = proc.process(f);
 			System.out.println(subBMarkData != null ? subBMarkData : "[ERROR]\t" + f.getAbsolutePath());
 			resultsCount += subBMarkData.getMarkerCount();
