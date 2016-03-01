@@ -41,8 +41,10 @@ public class BenchmarkData {
 	
 	private String getReadableTimeString(float millis){
 		float sec = millis / (float)1000;
-		if (sec > 60) return sec/(float)60 + " min.";
-		else return sec + " sec.";
+		if (sec > 86400) return sec/(float)60/(float)60/(float)24 + " days";
+		if (sec > 3600) return sec/(float)60/(float)60 + " hours";
+		if (sec > 60) return sec/(float)60 + " minutes";
+		else return sec + " seconds";
 	}
 
 

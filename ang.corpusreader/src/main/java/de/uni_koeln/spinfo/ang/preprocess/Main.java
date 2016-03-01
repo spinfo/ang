@@ -21,41 +21,15 @@ public class Main {
 			return;
 		}
 		
-		SimpleBenchmark bMark = new SimpleBenchmark();
-		bMark.startNewBenchmark("processing of files in " + args[0]);
-		List<File> files = IO.getAllFiles(args[0], Patterns.TWITTER_JSON_FILES);
-		
-		Collections.sort(files, new Comparator<File>(){
-			@Override
-			public int compare(File o1, File o2) {
-				Long size1 = o1.length();
-				return size1.compareTo(o2.length());
-			}
-		});
-		
-		MongoWrapper mongo = new MongoWrapper();
-		mongo.init("", "", "ang", "localhost", "27017", "angdata");
-		TwitterPreProcessor proc = new TwitterPreProcessor(mongo);
-		int resultsCount = 0;
-		
-		for (File f : files){
-			System.out.println("\n===== " + f.getName() + " ("
-					+ FormatConvert.getReadableDataSize(f.length()) + ") [file "
-					+ (bMark.getCurrentMarkerCount()+1)
-					+ "/" + files.size() + "] =====");
-			BenchmarkData subBMarkData = proc.process(f);
-			System.out.println(subBMarkData != null ? subBMarkData : "[ERROR]\t" + f.getAbsolutePath());
-			resultsCount += subBMarkData.getMarkerCount();
-			bMark.newMarker();
-		}
-		
-		mongo.close();
-		
-		BenchmarkData fullBMarkData = bMark.stopBenchMark();
-		System.out.println("\n\n===== RESULTS =====\n"
-				+ "processed files:\t" + fullBMarkData.getMarkerCount() + "\n"
-				+ "extracted objects:\t" + resultsCount + "\n"
-				+ "processing time:\t" + fullBMarkData.getRecordedTimeAsString() + "\n");
+		TwitterPreProcessor tpp = new TwitterPreProcessor();
+		tpp.process(args[0],
+				Patterns.TWITTER_JSON_FILES,
+				"", //db user
+				"", //db pass
+				"ang",
+				"localhost",
+				"27017",
+				"angdata");
 	}
 
 }

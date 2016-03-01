@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+
 import de.uni_koeln.spinfo.ang.benchmark.BenchmarkData;
 import de.uni_koeln.spinfo.ang.benchmark.SimpleBenchmark;
 import de.uni_koeln.spinfo.ang.utils.FormatConvert;
@@ -54,13 +56,15 @@ public abstract class AbstractPreProcessor {
 				mongoCollection);
 		
 		for (File f : files){
-			System.out.println("\n===== " + f.getName() + " ("
+			System.out.println("[PRCSS] " + f.getName() + " ("
 					+ FormatConvert.getReadableDataSize(f.length()) + ") [file "
 					+ (bMark.getCurrentMarkerCount()+1)
-					+ "/" + files.size() + "] =====");
+					+ "/" + files.size() + "] ...");
 			
 			//build CorpusObject and add to DB
-			mongo.addDocument(buildCorpusObject(f));
+			for (CorpusObject co : buildCorpusObject(f)){
+				mongo.addDocument(co);
+			}
 			
 			bMark.newMarker();
 		}
@@ -75,12 +79,12 @@ public abstract class AbstractPreProcessor {
 	
 	
 	/**
-	 * Creates, prepares and returns an instance of CorpusObject based
+	 * Creates, prepares and returns a set of CorpusObject instances based
 	 * on the data gathered from the input file.
 	 * @param inputFile
-	 * @return CorpusObject The resulting CorpusObject instance
+	 * @return Set<CorpusObject> The resulting set of CorpusObjects
 	 */
-	protected abstract CorpusObject buildCorpusObject(File inputFile);
+	protected abstract Set<CorpusObject> buildCorpusObject(File inputFile);
 	
 	
 }

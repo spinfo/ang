@@ -1,5 +1,7 @@
 package de.uni_koeln.spinfo.ang.utils;
 
+import java.util.Set;
+
 import org.bson.Document;
 
 import com.mongodb.MongoClient;
@@ -45,11 +47,25 @@ public class MongoWrapper {
 	
 	
 	public void addDocument(CorpusObject corpusObject){
+		if (isInitiated()) coll.insertOne(corpusObject.getBsonDocument());
+	}
+	
+	
+	public void addDocuments(Set<CorpusObject> corpusObjects){
+		if (!isInitiated()) return;
+		for (CorpusObject co : corpusObjects){
+			coll.insertOne(co.getBsonDocument());
+		}
+	}
+	
+	
+	private boolean isInitiated(){
 		if (coll == null || database == null || mongoClient == null){
 			System.err.println("[DBWRP]\tMongoWrapper not properly initiated!");
-			return;
+			return false;
+		} else {
+			return true;
 		}
-		coll.insertOne(corpusObject.getBsonDocument());
 	}
 
 }
