@@ -1,4 +1,4 @@
-package de.uni_koeln.spinfo.ang.goldstnd;
+package de.uni_koeln.spinfo.ang.util;
 
 import java.io.File;
 
