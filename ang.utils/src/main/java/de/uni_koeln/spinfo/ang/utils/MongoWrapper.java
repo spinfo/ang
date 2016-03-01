@@ -1,4 +1,4 @@
-package de.uni_koeln.spinfo.ang.util;
+package de.uni_koeln.spinfo.ang.utils;
 
 import org.bson.Document;
 
@@ -7,7 +7,8 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-import de.uni_koeln.spinfo.ang.data.CorpusObject;
+import de.uni_koeln.spinfo.ang.utils.data.CorpusObject;
+
 
 public class MongoWrapper {
 	

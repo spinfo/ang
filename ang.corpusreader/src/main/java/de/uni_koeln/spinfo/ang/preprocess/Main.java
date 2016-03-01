@@ -7,10 +7,10 @@ import java.util.List;
 
 import de.uni_koeln.spinfo.ang.benchmark.BenchmarkData;
 import de.uni_koeln.spinfo.ang.benchmark.SimpleBenchmark;
-import de.uni_koeln.spinfo.ang.util.FormatConvert;
-import de.uni_koeln.spinfo.ang.util.IO;
-import de.uni_koeln.spinfo.ang.util.MongoWrapper;
-import de.uni_koeln.spinfo.ang.util.Patterns;
+import de.uni_koeln.spinfo.ang.utils.FormatConvert;
+import de.uni_koeln.spinfo.ang.utils.IO;
+import de.uni_koeln.spinfo.ang.utils.MongoWrapper;
+import de.uni_koeln.spinfo.ang.utils.Patterns;
 
 
 public class Main {

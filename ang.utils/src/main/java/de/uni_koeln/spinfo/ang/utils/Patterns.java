@@ -1,4 +1,4 @@
-package de.uni_koeln.spinfo.ang.util;
+package de.uni_koeln.spinfo.ang.utils;
 
 public class Patterns {
 	

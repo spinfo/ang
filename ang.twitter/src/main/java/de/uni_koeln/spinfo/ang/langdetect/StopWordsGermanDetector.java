@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.uni_koeln.spinfo.ang.util.IO;
+import de.uni_koeln.spinfo.ang.utils.IO;
 
 
 public class StopWordsGermanDetector implements IGermanDetector {

@@ -20,7 +20,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import de.uni_koeln.spinfo.ang.benchmark.BenchmarkData;
 import de.uni_koeln.spinfo.ang.benchmark.SimpleBenchmark;
 import de.uni_koeln.spinfo.ang.langdetect.IGermanDetector;
-import de.uni_koeln.spinfo.ang.langdetect.LangDetectGermanDetector;
+import de.uni_koeln.spinfo.ang.langdetect.TikaGermanDetector;
 
 
 public class TwitterJsonPreProcessingOld {
@@ -72,9 +72,8 @@ public class TwitterJsonPreProcessingOld {
 		JsonSurfer surfer = new JsonSurfer(JacksonParser.INSTANCE, JavaCollectionProvider.INSTANCE);
         SurfingConfiguration config = surfer.configBuilder().bind("$.text", new JsonPathListener() {
                 	private int count = 0;
-//                	private IGermanDetector detector = new TikaGermanDetector();
+                	private IGermanDetector detector = new TikaGermanDetector();
 //                	private IGermanDetector detector = new NaiveGermanDetector();
-                	private IGermanDetector detector = new LangDetectGermanDetector();
 //                	private IGermanDetector detector = new StopWordsGermanDetector();
                 	
                     @Override

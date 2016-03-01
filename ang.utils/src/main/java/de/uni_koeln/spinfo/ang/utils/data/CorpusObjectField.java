@@ -1,4 +1,4 @@
-package de.uni_koeln.spinfo.ang.data;
+package de.uni_koeln.spinfo.ang.utils.data;
 
 public enum CorpusObjectField {
 	
