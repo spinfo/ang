@@ -1,7 +1,5 @@
 package de.uni_koeln.spinfo.ang.util;
 
-import de.uni_koeln.spinfo.ang.preprocess.Patterns;
-
 public class FormatConvert {
 	
 	public static int monthWordShortToNumber(String month){

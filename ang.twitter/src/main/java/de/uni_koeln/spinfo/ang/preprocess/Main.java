@@ -10,6 +10,8 @@ import de.uni_koeln.spinfo.ang.benchmark.SimpleBenchmark;
 import de.uni_koeln.spinfo.ang.util.FormatConvert;
 import de.uni_koeln.spinfo.ang.util.IO;
 import de.uni_koeln.spinfo.ang.util.MongoWrapper;
+import de.uni_koeln.spinfo.ang.util.Patterns;
+
 
 public class Main {
 

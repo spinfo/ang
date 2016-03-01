@@ -20,6 +20,7 @@ import de.uni_koeln.spinfo.ang.langdetect.TikaGermanDetector;
 import de.uni_koeln.spinfo.ang.util.FormatConvert;
 import de.uni_koeln.spinfo.ang.util.IO;
 import de.uni_koeln.spinfo.ang.util.MongoWrapper;
+import de.uni_koeln.spinfo.ang.util.Patterns;
 
 public class TwitterPreProcessor {
 	
@@ -39,7 +40,6 @@ public class TwitterPreProcessor {
 		String fileName = file.getName();
 		BufferedReader br = IO.getFileReader(path);
 		String jsonObject;
-//		JsonFactory factory = new JsonFactory();
 		IGermanDetector deDetector = new TikaGermanDetector();
 		Map<String, Object> map = new HashMap<String, Object>();
 		
@@ -62,6 +62,7 @@ public class TwitterPreProcessor {
 				if (textCleaned.matches(Patterns.HAS_LATIN_CHARS)
 						&& deDetector.isGerman(textCleaned)){
 					
+					//create and prepare corpus object
 					CorpusObject corpusObject = new CorpusObject();
 					corpusObject.addData(CorpusObjectField.TEXT_STRING, text);
 					corpusObject.addData(CorpusObjectField.ID_STRING,
@@ -81,43 +82,13 @@ public class TwitterPreProcessor {
 					
 //					System.out.println(textCleaned);
 					
-					//make output directory
-//					File dir = new File(path + "_output" + File.separator);
-//					if (!dir.exists()) dir.mkdir();
-//					
-//					JsonGenerator g = factory.createGenerator(
-//							IO.getFileWriter(dir.getAbsolutePath() 
-//									+ File.separator 
-//									+ map.get("id_str") + ".json"));
-//
-//					g.writeStartObject();
-//					g.writeStringField(CorpusObjectField.TEXT.v(), text);
-//					g.writeStringField(CorpusObjectField.ID.v(),
-//							"twitter-" + map.get("id_str").toString());
-//					g.writeStringField(CorpusObjectField.DATE_YEAR.v(),
-//							FormatConvert.yearFromTwitterDateString(
-//									map.get("created_at").toString())+"");
-//					g.writeStringField(CorpusObjectField.DATE_MONTH.v(),
-//							FormatConvert.monthFromTwitterDateString(
-//									map.get("created_at").toString())+"");
-//					g.writeStringField(CorpusObjectField.SOURCE.v(), "twitter");
-//					g.writeStringField(CorpusObjectField.SOURCE_FILE.v(), fileName);
-//					g.writeStringField(CorpusObjectField.SOURCE_ARCHIVE.v(), fileName + ".gz");
-//					g.writeStringField(CorpusObjectField.LENGTH.v(), text.length()+"");
-//					g.writeEndObject();
-//					g.close();
-					//benchmark step
-					bMark.newMarker();
+					bMark.newMarker(); //set benchmark step marker
 				}
-				
-				
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		//delete temp file
-//		IO.deleteFile(tempPath);
 		return bMark.stopBenchMark();
 	}
 	
@@ -134,37 +105,6 @@ public class TwitterPreProcessor {
 				.replaceAll(Patterns.TWITTER_MENTION, "")
 				.replaceAll(Patterns.URL, "");
 	}
-	
-	
-//	private String cleanFile(String path){
-//		System.out.print("[CLEAN]\t" + path + " ...");
-//		String outPath = path + ".tmp";
-//		
-//		try {
-//			BufferedReader br = IO.getFileReader(path);
-//			OutputStreamWriter bw = IO.getFileWriter(outPath);
-//			String line;
-//			
-//			//skip lines without json data and lines not tagged "de"
-//			//then clean lines from invalid chars etc.
-//			while ((line = br.readLine()) != null) {
-//				if (!line.matches(Patterns.PATTERN_JSON_OBJECT_LANG_DE)) continue;
-//				line = cleanStringFromInvalidChars(line);
-//				bw.write(line);
-//				bw.write("\n");
-//			}
-//			
-//			br.close();
-//			bw.flush();
-//			bw.close();
-//		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		System.out.println(" DONE");
-//		return outPath;
-//	}
 	
 	
 	private String getValidatedJsonObject(String data){
