@@ -3,7 +3,7 @@ package de.uni_koeln.spinfo.ang.preprocess;
 import de.uni_koeln.spinfo.ang.utils.Patterns;
 
 
-public class Main {
+public class TestPreProcessorApp {
 
 	public static void main(String[] args) {
 		if (args.length < 1){
