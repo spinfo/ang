@@ -19,7 +19,8 @@ public class WackyPreProcessor extends AbstractPreProcessor {
 		String line;
 		try {
 			while ((line = br.readLine()) != null){
-				if (line.matches(Patterns.WACKY_URL_LINE)) continue;
+				if (line.matches(Patterns.WACKY_URL_LINE)
+						|| line.length() < 10) continue;
 				
 				line = AngStringUtils.cleanStringFromInvalidChars(line);
 				line = AngStringUtils.normalize(line);

@@ -17,7 +17,7 @@ public class Patterns {
 	public static final String DATE_MONTH_WORD_SHORT	= "(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dez)";
 	public static final String TWITTER_JSON_FILES		= ".+\\.(json|geo)";
 	public static final String EVERYTHING				= ".*";
-	public static final String WACKY_URL_LINE			= "CURRENT URL.*";
+	public static final String WACKY_URL_LINE			= "^CURRENT URL.*";
 	
 
 }
