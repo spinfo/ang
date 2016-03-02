@@ -1,6 +1,6 @@
 package de.uni_koeln.spinfo.ang.utils;
 
-import java.util.Set;
+import java.util.List;
 
 import org.bson.Document;
 
@@ -8,8 +8,6 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-
-import de.uni_koeln.spinfo.ang.utils.data.CorpusObject;
 
 
 public class MongoWrapper {
@@ -46,16 +44,15 @@ public class MongoWrapper {
 	}
 	
 	
-	public void addDocument(CorpusObject corpusObject){
-		if (isInitiated()) coll.insertOne(corpusObject.getBsonDocument());
+	public void addDocument(Document corpusDocument){
+		if (!isInitiated()) return;
+		coll.insertOne(corpusDocument);
 	}
 	
 	
-	public void addDocuments(Set<CorpusObject> corpusObjects){
+	public void addDocuments(List<Document> corpusDocuments){
 		if (!isInitiated()) return;
-		for (CorpusObject co : corpusObjects){
-			coll.insertOne(co.getBsonDocument());
-		}
+		coll.insertMany(corpusDocuments);
 	}
 	
 	

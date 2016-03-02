@@ -3,10 +3,12 @@ package de.uni_koeln.spinfo.ang.preprocess;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import org.bson.Document;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,8 +26,8 @@ public class TwitterPreProcessor extends AbstractPreProcessor {
 	
 	
 	@Override
-	protected Set<CorpusObject> buildCorpusObject(File inputFile) {
-		Set<CorpusObject> obj = new HashSet<CorpusObject>();
+	protected List<Document> buildCorpusObjects(File inputFile) {
+		List<Document> docs = new ArrayList<Document>();
 		String path = inputFile.getAbsolutePath();
 		String fileName = inputFile.getName();
 		BufferedReader br = IO.getFileReader(path);
@@ -65,14 +67,14 @@ public class TwitterPreProcessor extends AbstractPreProcessor {
 					corpusObject.addData(CorpusObjectField.SOURCE_FILE_STRING, fileName);
 					corpusObject.addData(CorpusObjectField.SOURCE_ARCHIVE_STRING, fileName + ".gz");
 					corpusObject.addData(CorpusObjectField.LENGTH_INT, text.length());
-					obj.add(corpusObject);
+					docs.add(corpusObject.getBsonDocument());
 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		return obj;
+		return docs;
 	}
 	
 	

@@ -1,15 +1,5 @@
 package de.uni_koeln.spinfo.ang.preprocess;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import de.uni_koeln.spinfo.ang.benchmark.BenchmarkData;
-import de.uni_koeln.spinfo.ang.benchmark.SimpleBenchmark;
-import de.uni_koeln.spinfo.ang.utils.FormatConvert;
-import de.uni_koeln.spinfo.ang.utils.IO;
-import de.uni_koeln.spinfo.ang.utils.MongoWrapper;
 import de.uni_koeln.spinfo.ang.utils.Patterns;
 
 
@@ -21,9 +11,9 @@ public class Main {
 			return;
 		}
 		
-		TwitterPreProcessor tpp = new TwitterPreProcessor();
+		AbstractPreProcessor tpp = new TestPreProcessor();
 		tpp.process(args[0],
-				Patterns.TWITTER_JSON_FILES,
+				Patterns.EVERYTHING,
 				"", //db user
 				"", //db pass
 				"ang",
