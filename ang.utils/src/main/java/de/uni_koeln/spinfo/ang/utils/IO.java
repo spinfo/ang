@@ -31,6 +31,7 @@ public class IO {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
 		return sb.toString();
 	}
 	
@@ -75,9 +76,13 @@ public class IO {
 		List<File> files = new ArrayList<File>();
 		File dir = new File(directoryPath);
 		
-		if (!dir.exists() || !dir.isDirectory()){
-			System.out.println("[IOERR]\t" + directoryPath
-					+ " doesn't exist or is not a directory!");
+		if (!dir.exists()){
+			System.out.println("[IOERR]\t" + directoryPath + " doesn't exist!");
+			return files;
+		}
+		
+		if (!dir.isDirectory()){
+			if (dir.isFile()) files.add(dir);
 			return files;
 		}
 		
