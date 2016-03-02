@@ -16,6 +16,12 @@ public class AngStringUtils {
 			      	 .replaceAll(Patterns.INCOMPLETE_UNICODE, "")
 					 .replaceAll("\n", " ");
 	}
+	
+	
+	public static int generateID(Object seed){
+		int idHash = seed.hashCode();
+		return idHash > 0 ? idHash : idHash*-1;
+	}
 
 	
 }
