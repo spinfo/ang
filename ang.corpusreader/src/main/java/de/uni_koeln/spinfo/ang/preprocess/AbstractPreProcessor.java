@@ -15,6 +15,7 @@ import de.uni_koeln.spinfo.ang.utils.MongoWrapper;
 public abstract class AbstractPreProcessor {
 	
 	protected MongoWrapper mongo;
+	protected SimpleBenchmark bMark;
 	
 	
 	public void process(String dirPath,
@@ -26,7 +27,7 @@ public abstract class AbstractPreProcessor {
 			String mongoPort,
 			String mongoCollection){
 		
-		SimpleBenchmark bMark = new SimpleBenchmark();
+		bMark = new SimpleBenchmark();
 		bMark.startNewBenchmark("processing of files in " + dirPath);
 		List<File> files = IO.getAllFiles(dirPath, fileNamePattern);
 		
