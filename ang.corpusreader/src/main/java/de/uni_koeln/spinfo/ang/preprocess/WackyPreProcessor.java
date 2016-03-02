@@ -24,8 +24,7 @@ public class WackyPreProcessor extends AbstractPreProcessor {
 				line = AngStringUtils.cleanStringFromInvalidChars(line);
 				line = AngStringUtils.normalize(line);
 				
-				int idHash = line.hashCode();
-				idHash = idHash > 0 ? idHash : idHash*-1;
+				int idHash = AngStringUtils.generateID(line);
 				
 				CorpusObject obj = new CorpusObject();
 				obj.addData(CorpusObjectField.ID_STRING, "wacky-" + idHash);
