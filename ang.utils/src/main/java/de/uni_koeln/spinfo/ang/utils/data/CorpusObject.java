@@ -18,6 +18,7 @@ public class CorpusObject {
 			System.err.println("[ERROR]\tdata \"" + data.toString()
 			+ "\" added to CorpusObject instance has wrong type (should be "
 					+ fieldKey.getType() + ")!");
+			return;
 		}
 		this.data.put(fieldKey.toString(), data);
 	}
