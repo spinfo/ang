@@ -1,13 +1,13 @@
 package de.uni_koeln.spinfo.ang.utils;
 
+import java.util.List;
+
 import org.bson.Document;
 
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-
-import de.uni_koeln.spinfo.ang.utils.data.CorpusObject;
 
 
 public class MongoWrapper {
@@ -44,12 +44,25 @@ public class MongoWrapper {
 	}
 	
 	
-	public void addDocument(CorpusObject corpusObject){
+	public void addDocument(Document corpusDocument){
+		if (!isInitiated()) return;
+		coll.insertOne(corpusDocument);
+	}
+	
+	
+	public void addDocuments(List<Document> corpusDocuments){
+		if (!isInitiated()) return;
+		coll.insertMany(corpusDocuments);
+	}
+	
+	
+	private boolean isInitiated(){
 		if (coll == null || database == null || mongoClient == null){
 			System.err.println("[DBWRP]\tMongoWrapper not properly initiated!");
-			return;
+			return false;
+		} else {
+			return true;
 		}
-		coll.insertOne(corpusObject.getBsonDocument());
 	}
 
 }
