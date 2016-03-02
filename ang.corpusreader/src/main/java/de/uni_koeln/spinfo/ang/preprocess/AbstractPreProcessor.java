@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.bson.Document;
-
 import de.uni_koeln.spinfo.ang.benchmark.BenchmarkData;
 import de.uni_koeln.spinfo.ang.benchmark.SimpleBenchmark;
 import de.uni_koeln.spinfo.ang.utils.FormatConvert;
@@ -16,7 +14,7 @@ import de.uni_koeln.spinfo.ang.utils.MongoWrapper;
 
 public abstract class AbstractPreProcessor {
 	
-	private MongoWrapper mongo;
+	protected MongoWrapper mongo;
 	
 	
 	public void process(String dirPath,
@@ -63,7 +61,7 @@ public abstract class AbstractPreProcessor {
 					+ "/" + files.size() + "] ...");
 			
 			//build CorpusObject and add to DB
-			mongo.addDocuments(buildCorpusObjects(f));
+			transformCorpusObjects(f);
 			
 			bMark.newMarker();
 		}
@@ -78,12 +76,12 @@ public abstract class AbstractPreProcessor {
 	
 	
 	/**
-	 * Creates, prepares and returns a list of BSON Document instances based
-	 * on the data gathered from the input file.
+	 * Transforms input data to BSON Document instances and inserts into DB.
+	 * This method must call "mongo.addDocument()" for every document created.
 	 * @param inputFile
 	 * @return List<Document> The resulting list of Documents
 	 */
-	protected abstract List<Document> buildCorpusObjects(File inputFile);
+	protected abstract void transformCorpusObjects(File inputFile);
 	
 	
 }

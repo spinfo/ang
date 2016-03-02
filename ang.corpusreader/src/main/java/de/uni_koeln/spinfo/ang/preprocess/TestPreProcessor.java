@@ -3,11 +3,6 @@ package de.uni_koeln.spinfo.ang.preprocess;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bson.Document;
-
 import de.uni_koeln.spinfo.ang.utils.AngStringUtils;
 import de.uni_koeln.spinfo.ang.utils.IO;
 import de.uni_koeln.spinfo.ang.utils.data.CorpusObject;
@@ -16,8 +11,7 @@ import de.uni_koeln.spinfo.ang.utils.data.CorpusObjectField;
 public class TestPreProcessor extends AbstractPreProcessor {
 
 	@Override
-	protected List<Document> buildCorpusObjects(File inputFile) {
-		List<Document> docs = new ArrayList<Document>();
+	protected void transformCorpusObjects(File inputFile) {
 		BufferedReader br = IO.getFileReader(inputFile.getAbsolutePath());
 		
 		String line;
@@ -29,13 +23,11 @@ public class TestPreProcessor extends AbstractPreProcessor {
 				CorpusObject obj = new CorpusObject();
 				obj.addData(CorpusObjectField.ID_STRING, "test-" + line.hashCode());
 				obj.addData(CorpusObjectField.TEXT_STRING, line);
-				docs.add(obj.getBsonDocument());
+				mongo.addDocument(obj.getBsonDocument()); //MUST be called for every created document!
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		return docs;
 	}
 
 }
