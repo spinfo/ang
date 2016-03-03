@@ -10,9 +10,9 @@ public class PreProcessorApp {
 			return;
 		}
 		
-		AbstractPreProcessor pp = new DOChatKorpusPreProcessor();
+		AbstractPreProcessor pp = new DSAStrukturPreProcessor();
 		pp.process(args[0],
-				Patterns.FILE_NAME_ADD_EXTENSION + "xml", //file name pattern
+				Patterns.FILE_NAME_ADD_EXTENSION + "txt", //file name pattern
 				"", //db user
 				"", //db pass
 				"ang", //db name

@@ -18,7 +18,9 @@ public class DSAStrukturPreProcessor extends AbstractPreProcessor {
 		String line;
 		try {
 			while ((line = br.readLine()) != null){
-				line = line.replaceAll("^.+\\s", "");
+				line = line.replaceAll("^\\S+\\s", "")
+						.replaceAll("says\\:(\\\\t|\\s)", "")
+						.replaceAll("\\[.+\\]", "").trim();
 				if (line.length() < 10) continue;
 				
 				line = AngStringUtils.cleanStringFromInvalidChars(line);
