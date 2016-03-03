@@ -107,7 +107,11 @@
 			<version>5.4.0</version>
 		</dependency>
 
-
+		<dependency>
+		    <groupId>com.jcabi</groupId>
+		    <artifactId>jcabi-xml</artifactId>
+		    <version>0.17.2</version>
+		</dependency>
 
 	</dependencies>
 
