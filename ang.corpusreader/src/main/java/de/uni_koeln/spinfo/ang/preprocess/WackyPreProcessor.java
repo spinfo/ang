@@ -36,7 +36,6 @@ public class WackyPreProcessor extends AbstractPreProcessor {
 				obj.addData(CorpusObjectField.LENGTH_INT, line.length());
 				
 				mongo.addDocument(obj.getBsonDocument());
-				bMark.newMarker();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

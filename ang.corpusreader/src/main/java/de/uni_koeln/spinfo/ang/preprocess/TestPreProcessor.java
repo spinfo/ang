@@ -25,7 +25,6 @@ public class TestPreProcessor extends AbstractPreProcessor {
 				obj.addData(CorpusObjectField.TEXT_STRING, line);
 				obj.addData(CorpusObjectField.LENGTH_INT, line.length());
 				mongo.addDocument(obj.getBsonDocument()); //MUST be called for every created document!
-				bMark.newMarker();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
