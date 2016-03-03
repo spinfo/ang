@@ -34,11 +34,13 @@ public class DOChatKorpusPreProcessor extends AbstractPreProcessor {
 					
 					if (nick == null || nick.equalsIgnoreCase("server")) continue;
 						
-					String text = msg.xpath("messageHead/nickname/text()").get(0);
+					String text = msg.xpath("messageBody/text()").get(0);
 					text = AngStringUtils.cleanStringFromInvalidChars(text);
 					text = AngStringUtils.normalize(text);
+					text = text.replaceAll("\\\\t", "");
+					text = text.trim();
 					
-					if (text.length() < 5) continue;
+					if (text.length() < 5 || text.split(" ").length < 2) continue;
 					
 					CorpusObject obj = new CorpusObject();
 					obj.addData(CorpusObjectField.ID_STRING,

@@ -6,7 +6,6 @@ import java.io.IOException;
 
 import de.uni_koeln.spinfo.ang.utils.AngStringUtils;
 import de.uni_koeln.spinfo.ang.utils.IO;
-import de.uni_koeln.spinfo.ang.utils.Patterns;
 import de.uni_koeln.spinfo.ang.utils.data.CorpusObject;
 import de.uni_koeln.spinfo.ang.utils.data.CorpusObjectField;
 
