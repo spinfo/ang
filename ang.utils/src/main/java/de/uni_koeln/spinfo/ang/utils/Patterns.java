@@ -20,6 +20,7 @@ public class Patterns {
 	public static final String TWITTER_JSON_FILES		= ".+\\.(json|geo)";
 	public static final String EVERYTHING				= ".*";
 	public static final String WACKY_URL_LINE			= "^CURRENT URL.*";
+	public static final String FILE_NAME_ADD_EXTENSION	= "^.+\\.";
 
 
 }
