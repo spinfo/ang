@@ -1,4 +1,4 @@
-package de.uni_koeln.spinfo.ang.preprocess;
+package de.uni_koeln.spinfo.ang.preprocess.dump;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
