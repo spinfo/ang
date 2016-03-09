@@ -22,7 +22,7 @@ public class TwitterPreProcessor extends AbstractPreProcessor {
 	
 	
 	@Override
-	protected void transformCorpusObjects(File inputFile) {
+	protected void transformCorpusObjects(File inputFile, int fileCount) {
 		String path = inputFile.getAbsolutePath();
 		String fileName = inputFile.getName();
 		BufferedReader br = IO.getFileReader(path);

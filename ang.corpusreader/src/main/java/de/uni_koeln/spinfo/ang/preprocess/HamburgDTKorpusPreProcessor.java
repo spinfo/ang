@@ -12,11 +12,13 @@ import de.uni_koeln.spinfo.ang.utils.data.CorpusObjectField;
 public class HamburgDTKorpusPreProcessor extends AbstractPreProcessor {
 
 	@Override
-	protected void transformCorpusObjects(File inputFile) {
+	protected void transformCorpusObjects(File inputFile, int fileCount) {
 		BufferedReader br = IO.getFileReader(inputFile.getAbsolutePath());
 		
 		String line;
 		String text = "";
+		long count = 0;
+		
 		try {
 			while ((line = br.readLine()) != null){
 				
@@ -39,7 +41,8 @@ public class HamburgDTKorpusPreProcessor extends AbstractPreProcessor {
 					}
 					
 					CorpusObject obj = new CorpusObject();
-					obj.addData(CorpusObjectField.ID_STRING, "hamburg-dependency-treebank-" + idHash);
+					obj.addData(CorpusObjectField.ID_STRING, "hamburg-dependency-treebank-"
+							+ fileCount + "" + count + "" + idHash);
 					obj.addData(CorpusObjectField.TEXT_STRING, text);
 					obj.addData(CorpusObjectField.SOURCE_STRING, "hamburg-dependency-treebank");
 					obj.addData(CorpusObjectField.SOURCE_FILE_STRING, inputFile.getName());

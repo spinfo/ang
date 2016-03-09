@@ -55,6 +55,7 @@ public abstract class AbstractPreProcessor {
 				mongoPort,
 				mongoCollection);
 		
+		int fileCount = 1;
 		for (File f : files){
 			System.out.println("[PRCSS] " + f.getName() + " ("
 					+ FormatConvert.getReadableDataSize(f.length()) + ") [file "
@@ -62,7 +63,7 @@ public abstract class AbstractPreProcessor {
 					+ "/" + files.size() + "] ...");
 			
 			//build CorpusObject and add to DB
-			transformCorpusObjects(f);
+			transformCorpusObjects(f, fileCount++);
 			
 			bMark.newMarker();
 		}
@@ -82,7 +83,7 @@ public abstract class AbstractPreProcessor {
 	 * @param inputFile
 	 * @return List<Document> The resulting list of Documents
 	 */
-	protected abstract void transformCorpusObjects(File inputFile);
+	protected abstract void transformCorpusObjects(File inputFile, int fileCount);
 	
 	
 }

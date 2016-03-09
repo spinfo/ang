@@ -13,7 +13,7 @@ import de.uni_koeln.spinfo.ang.utils.data.CorpusObjectField;
 public class WackyPreProcessor extends AbstractPreProcessor {
 
 	@Override
-	protected void transformCorpusObjects(File inputFile) {
+	protected void transformCorpusObjects(File inputFile, int fileCount) {
 		BufferedReader br = IO.getFileReader(inputFile.getAbsolutePath());
 		
 		String line;
