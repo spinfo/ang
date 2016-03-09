@@ -17,7 +17,7 @@ public class HamburgDTKorpusPreProcessor extends AbstractPreProcessor {
 		
 		String line;
 		String text = "";
-		long count = 0;
+		long count = 1;
 		
 		try {
 			while ((line = br.readLine()) != null){
@@ -42,7 +42,7 @@ public class HamburgDTKorpusPreProcessor extends AbstractPreProcessor {
 					
 					CorpusObject obj = new CorpusObject();
 					obj.addData(CorpusObjectField.ID_STRING, "hamburg-dependency-treebank-"
-							+ fileCount + "" + count + "" + idHash);
+							+ fileCount + "" + count++ + "" + idHash);
 					obj.addData(CorpusObjectField.TEXT_STRING, text);
 					obj.addData(CorpusObjectField.SOURCE_STRING, "hamburg-dependency-treebank");
 					obj.addData(CorpusObjectField.SOURCE_FILE_STRING, inputFile.getName());
