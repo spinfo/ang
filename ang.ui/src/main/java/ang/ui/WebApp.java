@@ -1,14 +1,11 @@
 package ang.ui;
 
-import static spark.Spark.get;
-import static spark.Spark.port;
-import static spark.Spark.staticFileLocation;
-import static spark.Spark.stop;
+import static spark.Spark.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.bson.Document;
 
@@ -29,6 +26,8 @@ public class WebApp {
 	
 	
 	public void mapRoutes(){
+		staticFileLocation("/spark/template/freemarker");
+		
 		//set port
 		port(8080);
 		
@@ -43,7 +42,7 @@ public class WebApp {
 			model.put("query", query);
 			model.put("source", source);
 			
-			Set<DBData> data = new HashSet<DBData>();
+			List<DBData> data = new ArrayList<DBData>();
 			
 			if (query != null){
 				FindIterable<Document> results = mongo.getSearchResults(query, source);
