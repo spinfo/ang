@@ -2,9 +2,10 @@ package de.uni_koeln.spinfo.ang.utils;
 
 public class Patterns {
 	
-	public static final String TWITTER_MENTION 			= "(?<=^|(?<=[^a-zA-Z0-9-\\.]))@([A-Za-z0-9_]+)([^a-zA-Z0-9_]|$)";
-	public static final String TWITTER_HASHTAG 			= "(?<=^|(?<=[^a-zA-Z0-9-_\\.]))#([A-Za-z]+[A-Za-z0-9_]+)";
-	public static final String TWITTER_RETWEET 			= "RT\\s" + TWITTER_MENTION + "\\s";
+	public static final String TWITTER_MENTION 			= "(?<=^|(?<=[^a-zA-ZöüäÖÜÄ0-9-\\.]))@([A-Za-zöüäÖÜÄ0-9_]+)";
+	public static final String TWITTER_HASHTAG 			= "(?<=^|(?<=[^a-zA-ZöüäÖÜÄ0-9-_\\.]))#([A-Za-zöüäÖÜÄ]+[A-Za-zöüäÖÜÄ0-9_]+)";
+	public static final String TWITTER_RETWEET 			= "RT\\s" + TWITTER_MENTION;
+	public static final String TWITTER_RETWEET_SHORT 	= "^RT";
 	public static final String UNICODES					= "\\\\u(?=[a-fA-F0-9]{4})";
 	public static final String HAS_LATIN_CHARS			= ".*\\p{L}+.*";
 	public static final String URL						= "(http|https|ftp)\\:\\/\\/[^\\s$]+(?=(\\s|$))";

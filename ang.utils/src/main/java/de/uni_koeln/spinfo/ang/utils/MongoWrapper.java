@@ -74,6 +74,16 @@ public class MongoWrapper {
 	}
 	
 	
+	public MongoCollection<Document> getCollection(String collectionName){
+		if (!isInitiated()
+				|| collectionName == null
+				|| collectionName.length() == 0)
+			return null;
+		
+		return database.getCollection(collectionName);
+	}
+	
+	
 	private boolean isInitiated(){
 		if (coll == null || database == null || mongoClient == null){
 			System.err.println("[DBWRP]\tMongoWrapper not properly initiated!");
