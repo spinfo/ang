@@ -6,6 +6,7 @@ public class Patterns {
 	public static final String TWITTER_HASHTAG 			= "(?<=^|(?<=[^a-zA-ZöüäÖÜÄ0-9-_\\.]))#([A-Za-zöüäÖÜÄ]+[A-Za-zöüäÖÜÄ0-9_]+)";
 	public static final String TWITTER_RETWEET 			= "RT\\s" + TWITTER_MENTION;
 	public static final String TWITTER_RETWEET_SHORT 	= "^RT";
+	public static final String TWITTER_PLACEHOLDER	 	= "\\[(HASHTAG|MENTION|RETWEET|URL)\\d+\\]";
 	public static final String UNICODES					= "\\\\u(?=[a-fA-F0-9]{4})";
 	public static final String HAS_LATIN_CHARS			= ".*\\p{L}+.*";
 	public static final String URL						= "(http|https|ftp)\\:\\/\\/[^\\s$]+(?=(\\s|$))";
