@@ -10,7 +10,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.uni_koeln.spinfo.ang.langdetect.IGermanDetector;
-import de.uni_koeln.spinfo.ang.langdetect.TikaGermanDetector;
+import de.uni_koeln.spinfo.ang.langdetect.TikaLanguageDetector;
 import de.uni_koeln.spinfo.ang.utils.AngStringUtils;
 import de.uni_koeln.spinfo.ang.utils.FormatConvert;
 import de.uni_koeln.spinfo.ang.utils.IO;
@@ -27,7 +27,7 @@ public class TwitterPreProcessor extends AbstractPreProcessor {
 		String fileName = inputFile.getName();
 		BufferedReader br = IO.getFileReader(path);
 		String jsonObject;
-		IGermanDetector deDetector = new TikaGermanDetector();
+		IGermanDetector deDetector = new TikaLanguageDetector();
 		Map<String, Object> map = new HashMap<String, Object>();
 		
 		try {
