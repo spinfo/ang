@@ -3,6 +3,8 @@ package de.uni_koeln.spinfo.ang.preprocess;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import de.uni_koeln.spinfo.ang.utils.AngStringUtils;
 import de.uni_koeln.spinfo.ang.utils.IO;
@@ -14,7 +16,9 @@ public class WackyPreProcessor extends AbstractPreProcessor {
 
 	@Override
 	protected void transformCorpusObjects(File inputFile, int fileCount) {
-		BufferedReader br = IO.getFileReader(inputFile.getAbsolutePath());
+		BufferedReader br = IO.getFileReader(
+				inputFile.getAbsolutePath(),
+				Charset.forName("windows-1252"));
 		
 		String line;
 		try {

@@ -10,9 +10,9 @@ public class PreProcessorApp {
 			return;
 		}
 		
-		AbstractPreProcessor pp = new HamburgDTKorpusPreProcessor();
+		AbstractPreProcessor pp = new WackyPreProcessor();
 		pp.process(args[0],
-				Patterns.FILE_NAME_ADD_EXTENSION + "conll", //file name pattern
+				"dewac_preproc", //file name pattern
 				"", //db user
 				"", //db pass
 				"ang", //db name

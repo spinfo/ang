@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +43,18 @@ public class IO {
 					new InputStreamReader(
 							   new FileInputStream(
 									   new File(filePath)), StandardCharsets.UTF_8));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public static BufferedReader getFileReader(String filePath, Charset charset){
+		try {
+			return new BufferedReader(
+					new InputStreamReader(
+							   new FileInputStream(
+									   new File(filePath)), charset));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
