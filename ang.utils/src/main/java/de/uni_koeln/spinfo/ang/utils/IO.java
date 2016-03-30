@@ -1,5 +1,6 @@
 package de.uni_koeln.spinfo.ang.utils;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,6 +14,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 
 public class IO {
@@ -119,6 +121,25 @@ public class IO {
             }
         }
         return files;
+	}
+	
+	
+	public static Properties loadProperties(String propertiesFileName, Class referenceClass){
+		Properties properties = new Properties();
+		BufferedInputStream stream;
+		
+		try {
+			stream = new BufferedInputStream(
+					referenceClass.getResourceAsStream(propertiesFileName));
+			properties.load(stream);
+			stream.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return properties;
 	}
 	
 }

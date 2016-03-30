@@ -1,6 +1,8 @@
 package de.uni_koeln.spinfo.ang.preprocess;
 
-import de.uni_koeln.spinfo.ang.utils.Patterns;
+import java.util.Properties;
+
+import de.uni_koeln.spinfo.ang.utils.IO;
 
 public class PreProcessorApp {
 
@@ -11,14 +13,18 @@ public class PreProcessorApp {
 		}
 		
 		AbstractPreProcessor pp = new WackyPreProcessor();
+		Properties props = IO.loadProperties("db.properties", pp.getClass());
+		System.out.println(props);
+		
 		pp.process(args[0],
 				"dewac_preproc", //file name pattern
-				"", //db user
-				"", //db pass
-				"ang", //db name
-				"localhost", //db host
-				"27017", //db port
-				"angdata"); //db collection name
+				props.getProperty("user"),	//USER
+				props.getProperty("pw"),		//PASS
+				props.getProperty("db"),		//DB
+				props.getProperty("host"),		//HOST
+				props.getProperty("port"),		//PORT
+				props.getProperty("collection"));//COLLECTION
+		
 	}
 
 }
