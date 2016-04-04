@@ -42,7 +42,7 @@ public class HamburgDTKorpusPreProcessor extends AbstractPreProcessor {
 					
 					CorpusObject obj = new CorpusObject();
 					obj.addData(CorpusObjectField.ID_STRING, "hamburg-dependency-treebank-"
-							+ fileCount + "" + count++ + "" + idHash);
+							+ fileCount + "-" + count++ + "-" + idHash);
 					obj.addData(CorpusObjectField.TEXT_STRING, text);
 					obj.addData(CorpusObjectField.SOURCE_STRING, "hamburg-dependency-treebank");
 					obj.addData(CorpusObjectField.SOURCE_FILE_STRING, inputFile.getName());

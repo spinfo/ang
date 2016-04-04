@@ -3,6 +3,7 @@ package de.uni_koeln.spinfo.ang.preprocess;
 import java.util.Properties;
 
 import de.uni_koeln.spinfo.ang.utils.IO;
+import de.uni_koeln.spinfo.ang.utils.Patterns;
 
 public class PreProcessorApp {
 
@@ -12,18 +13,18 @@ public class PreProcessorApp {
 			return;
 		}
 		
-		AbstractPreProcessor pp = new WackyPreProcessor();
+		AbstractPreProcessor pp = new HamburgDTKorpusPreProcessor();
 		Properties props = IO.loadProperties("db.properties", pp.getClass());
 		System.out.println(props);
 		
 		pp.process(args[0],
-				"dewac_preproc", //file name pattern
-				props.getProperty("user"),	//USER
-				props.getProperty("pw"),		//PASS
-				props.getProperty("db"),		//DB
-				props.getProperty("host"),		//HOST
-				props.getProperty("port"),		//PORT
-				props.getProperty("collection"));//COLLECTION
+				Patterns.FILE_NAME_ADD_EXTENSION + "conll", //file name pattern
+				"",	//USER
+				"",		//PASS
+				"ang",		//DB
+				"localhost",		//HOST
+				"27017",		//PORT
+				"angdata");//COLLECTION
 		
 	}
 
