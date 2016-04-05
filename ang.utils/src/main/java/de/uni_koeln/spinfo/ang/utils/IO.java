@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
@@ -20,10 +21,18 @@ import java.util.Properties;
 public class IO {
 	
 	public static String readFile(String path){
+		return readFile(path, null);
+	}
+	
+	
+	public static String readFile(String path, Charset charSet){
 		StringBuilder sb = new StringBuilder();
 
 		try {
-			BufferedReader in = getFileReader(path);
+			BufferedReader in =
+					charSet == null
+					? getFileReader(path)
+					: getFileReader(path, charSet);
 			String str;
 			      
 			while ((str = in.readLine()) != null) {
