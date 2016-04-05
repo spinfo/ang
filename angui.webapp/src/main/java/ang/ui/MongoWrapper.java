@@ -15,7 +15,7 @@ import com.mongodb.client.MongoDatabase;
 
 public class MongoWrapper {
 	
-	private MongoClient mongoClient;
+	private static MongoClient mongoClient;
 	private MongoDatabase database;
 	private MongoCollection<Document> coll;
 
@@ -36,6 +36,7 @@ public class MongoWrapper {
 				"mongodb://" + user + ":" + pass
 				+ "@" + host + ":" + port
 				+ "/?authSource=" + db + "&authMechanism=SCRAM-SHA-1");
+		if (mongoClient != null) mongoClient.close();
 		mongoClient = new MongoClient(uri);
 		database = mongoClient.getDatabase(db);
 		coll = database.getCollection(collection);
@@ -81,6 +82,7 @@ public class MongoWrapper {
 			BasicDBObject search = new BasicDBObject();
 			search.put("$search", query);
 			search.put("$caseSensitive", casesens);
+			search.put("$language", "none");
 			q.put("$text", search);
 		}
 		

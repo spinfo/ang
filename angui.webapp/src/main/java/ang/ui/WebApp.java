@@ -89,36 +89,36 @@ public class WebApp implements spark.servlet.SparkApplication {
 			List<DBData> data = new ArrayList<DBData>();
 			
 			//BLOCK FOR TESTING PURPOSES ONLY
-			Pattern pTemp = Pattern.compile("twitter", Pattern.CASE_INSENSITIVE);
-			data.add(new DBData("twitter", "Ich \"twitter\" das jetzt so!", findMatch("Ich twitter das jetzt so!", pTemp)));
-			data.add(new DBData("dings", "Hahaha twitter! ich werd bekloppt!", findMatch("Hahaha twitter! ich werd bekloppt!", pTemp)));
-			data.add(new DBData("quelle", "Och nööööö! Nicht Twitter!", findMatch("Och nööööö! Nicht Twitter!", pTemp)));
-			model.put("results", data);
+//			Pattern pTemp = Pattern.compile("twitter", Pattern.CASE_INSENSITIVE);
+//			data.add(new DBData("twitter", "Ich \"twitter\" das jetzt so!", findMatch("Ich twitter das jetzt so!", pTemp)));
+//			data.add(new DBData("dings", "Hahaha twitter! ich werd bekloppt!", findMatch("Hahaha twitter! ich werd bekloppt!", pTemp)));
+//			data.add(new DBData("quelle", "Och nööööö! Nicht Twitter!", findMatch("Och nööööö! Nicht Twitter!", pTemp)));
+//			model.put("results", data);
 			
 			
-//			if (query != null){
-//				Pattern pattern = casesens ?
-//						Pattern.compile(query)
-//						: Pattern.compile(query, Pattern.CASE_INSENSITIVE);
-//				FindIterable<Document> results = mongo.getSearchResults(
-//						query,
-//						source,
-//						regex,
-//						casesens,
-//						useyear,
-//						Integer.parseInt(yearfrom),
-//						Integer.parseInt(yearto));
-//				if (results != null){
-//					for (Document doc : results){
-//						String text = doc.getString("text");
-//						String match = findMatch(doc.getString("text"), pattern);
-//						text = trimText(text, match, Integer.parseInt(lengthlimit));
-//						
-//						data.add(new DBData(doc.getString("source"), text, match));
-//					}
-//					model.put("results", data);
-//				}
-//			}
+			if (query != null){
+				Pattern pattern = casesens ?
+						Pattern.compile(query)
+						: Pattern.compile(query, Pattern.CASE_INSENSITIVE);
+				FindIterable<Document> results = mongo.getSearchResults(
+						query,
+						source,
+						regex,
+						casesens,
+						useyear,
+						Integer.parseInt(yearfrom),
+						Integer.parseInt(yearto));
+				if (results != null){
+					for (Document doc : results){
+						String text = doc.getString("text");
+						String match = findMatch(doc.getString("text"), pattern);
+						text = trimText(text, match, Integer.parseInt(lengthlimit));
+						
+						data.add(new DBData(doc.getString("source"), text, match));
+					}
+					model.put("results", data);
+				}
+			}
 			
 			return new ModelAndView(model, "index.ftl");
         }, new FreeMarkerEngine());

@@ -8,6 +8,8 @@
 	<!-- Basic Page Needs
 	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
 	<meta charset="utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
 	<title>ANG-DB</title>
 	<meta name="robots" content="noindex,nofollow">
 
@@ -169,8 +171,8 @@
 	</div>
 
 	<div id="loader">
-		Bitte warten,<br/>
-		Datenbank wird durchsucht...<br/><br/>
+		Bitte warten, Datenbank wird durchsucht.<br/>
+		Dies kann u.U. mehrere Minuten dauern...<br/><br/>
 		<img src="loader.gif" alt=""/>
 	</div>
 
