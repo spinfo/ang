@@ -13,12 +13,12 @@ public class PreProcessorApp {
 			return;
 		}
 		
-		AbstractPreProcessor pp = new HamburgDTKorpusPreProcessor();
+		AbstractPreProcessor pp = new DOChatKorpusPreProcessor();
 		Properties props = IO.loadProperties("db.properties", pp.getClass());
 		System.out.println(props);
 		
 		pp.process(args[0],
-				Patterns.FILE_NAME_ADD_EXTENSION + "conll", //file name pattern
+				Patterns.FILE_NAME_ADD_EXTENSION + "xml", //file name pattern
 				"",	//USER
 				"",		//PASS
 				"ang",		//DB

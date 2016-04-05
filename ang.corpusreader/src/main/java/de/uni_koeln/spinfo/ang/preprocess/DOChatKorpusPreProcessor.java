@@ -1,12 +1,18 @@
 package de.uni_koeln.spinfo.ang.preprocess;
 
+
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import com.jcabi.xml.XML;
 import com.jcabi.xml.XMLDocument;
 
 import de.uni_koeln.spinfo.ang.utils.AngStringUtils;
+import de.uni_koeln.spinfo.ang.utils.IO;
 import de.uni_koeln.spinfo.ang.utils.data.CorpusObject;
 import de.uni_koeln.spinfo.ang.utils.data.CorpusObjectField;
 
@@ -18,7 +24,7 @@ public class DOChatKorpusPreProcessor extends AbstractPreProcessor {
 		XML xml = null;
 
 		try {
-			xml = new XMLDocument(inputFile);
+			xml = new XMLDocument(IO.readFile(inputFile.getAbsolutePath(), Charset.forName("windows-1252")));
 			List<XML> msgs = xml.nodes("//message");
 			
 			String date = xml.xpath("/logfile/head/record/@recDate").get(0);
