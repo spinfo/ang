@@ -93,16 +93,14 @@
 			<!-- TITLE -->
 			<div class="two columns"><h1><a href="search">ANG-DB</a></h1></div>
 
-			<!-- SPACER -->
-			<div class="one columns">&nbsp;</div>
-
 			<!-- SEARCH -->
 			<form action="search" id="searchForm">
-				<div class="eight columns searchForm">
+				<div class="seven columns searchForm">
 					<span id="buttonInstructions" class="fakeLink">Hinweise zur Such-Syntax</span>
+					<br/><br/>
 					<label for="caseSensInput">Groß-/Kleinschreibung beachten:</label>&nbsp;
 					<input type="checkbox" id="caseSensInput" name="casesens" <#if casesens?? && casesens == true>checked</#if> />
-					<br/><br/>
+					<br/>
 					<label for="useYearInput">Quellen ohne / mit anderem Datum ausschließen:</label>&nbsp;
 					<input type="checkbox" id="useYearInput" name="useyear" <#if useyear?? && useyear == true>checked</#if> />
 					<br/>
@@ -113,7 +111,7 @@
 					<input type="number" id="yearToInput" name="yearto" min="1" max="2200" value='${yearto!"2020"}' />
 				</div>
 				
-				<div class="five columns searchForm">
+				<div class="seven columns searchForm">
 					<label for="queryInput">Suchbegriff:</label>&nbsp;
 					<input type="text" id="queryInput" name="query" placeholder="z.B. Job" value='${query!""}' />
 					<br/>
