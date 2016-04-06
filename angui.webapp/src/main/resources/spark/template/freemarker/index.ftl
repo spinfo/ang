@@ -48,6 +48,17 @@
 			    $(this).children('input[type=submit]').attr('disabled', 'disabled');
 			});
 
+			//INSTRUCTIONS
+			<#if query?? && query != "">
+				$("#instructions").hide();
+			</#if>
+			$("#buttonInstructions").click(function() {
+				$("#instructions").show();
+			});
+			$("#instructions").click(function() {
+				$("#instructions").hide();
+			});
+
 			//HIGHLIGHT FOUND TEXT PASSAGES
 			<#if queries??>
 				<#list queries as q>
@@ -88,6 +99,7 @@
 			<!-- SEARCH -->
 			<form action="search" id="searchForm">
 				<div class="eight columns searchForm">
+					<span id="buttonInstructions" class="fakeLink">Hinweise zur Such-Syntax</span>
 					<label for="caseSensInput">Groß-/Kleinschreibung beachten:</label>&nbsp;
 					<input type="checkbox" id="caseSensInput" name="casesens" <#if casesens?? && casesens == true>checked</#if> />
 					<br/><br/>
@@ -170,6 +182,25 @@
 			<div class="textCenter" style="color: white; margin-top: 100px;">Bitte benutzen Sie die Suchfunktion!</div>
 		</#if>
 
+	</div>
+
+	<div id="instructions">
+		<span class="bold">Such-Syntax (Klicken zum Ausblenden!)</span><br/><br/>
+
+		Suche nach einzelnem Begriff:<br/>
+		<span class="mono">drink</span><br/><br/>
+
+		Suche nach mehreren optionalen Begriffen:<br/>
+		<span class="mono">drink alkohol</span><br/><br/>
+
+		Suche nach mehreren erforderlichen Begriffen:<br/>
+		<span class="mono">"drink" "alkohol"</span><br/><br/>
+
+		Suche nach zusammenhängender Phrase:<br/>
+		<span class="mono">"drink alkohol"</span><br/><br/>
+
+		Bestimmte Begriffe (mit Minus-Prefix) ausschließen:<br/>
+		<span class="mono">drink -alkohol</span>
 	</div>
 
 	<div id="loader">
