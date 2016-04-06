@@ -63,28 +63,20 @@ public class MongoWrapper {
 	public FindIterable<Document> getSearchResults(
 			String query,
 			String source,
-			boolean regex,
 			boolean casesens,
 			boolean useyear,
 			int yearfrom,
 			int yearto){
 		
 		if (!isInitiated() || query == null || query.length() == 0) return null;
-		
 		BasicDBObject q = new BasicDBObject();
+		
 		//text search (regex or index)
-		if (regex){
-			Pattern queryPattern = casesens ?
-					Pattern.compile(query)
-					: Pattern.compile(query, Pattern.CASE_INSENSITIVE);
-			q.put("text", queryPattern);
-		} else {
-			BasicDBObject search = new BasicDBObject();
-			search.put("$search", query);
-			search.put("$caseSensitive", casesens);
-			search.put("$language", "none");
-			q.put("$text", search);
-		}
+		BasicDBObject search = new BasicDBObject();
+		search.put("$search", query);
+		search.put("$caseSensitive", casesens);
+		search.put("$language", "none");
+		q.put("$text", search);
 		
 		//source
 		if (source != null && source.length() > 0)

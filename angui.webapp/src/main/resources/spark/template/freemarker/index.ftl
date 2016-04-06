@@ -48,10 +48,12 @@
 			    $(this).children('input[type=submit]').attr('disabled', 'disabled');
 			});
 
-			//HIGHLIGHT FOUND TEXT
-			$(".columnText").each(function() {
-				$(this).highlight(this.getAttribute("data-match"));
-			});
+			//HIGHLIGHT FOUND TEXT PASSAGES
+			<#if queries??>
+				<#list queries as q>
+					$("#tableResults").highlight('${q!""}');
+				</#list>
+			</#if>
 
 			//TOGGLE SOURCES COLUMN
 			$(".toggleSources").click(function() {
@@ -86,9 +88,6 @@
 			<!-- SEARCH -->
 			<form action="search" id="searchForm">
 				<div class="eight columns searchForm">
-					<label for="regexInput">Reguläre Ausdrücke aktivieren (langsam!):</label>&nbsp;
-					<input type="checkbox" id="regexInput" name="regex" <#if regex?? && regex == true>checked</#if> />
-					<br/>
 					<label for="caseSensInput">Groß-/Kleinschreibung beachten:</label>&nbsp;
 					<input type="checkbox" id="caseSensInput" name="casesens" <#if casesens?? && casesens == true>checked</#if> />
 					<br/><br/>
@@ -108,21 +107,24 @@
 					<br/>
 					<label for="sourceInput">Quelle:</label>&nbsp;
 					<select id="sourceInput" name="source">
-						<option value="" selected>Alle Quellen</option>
-						<option value="twitter">Twitter-Korpus (mit Datum)</option>
-						<option value="wacky">Wacky-Korpus</option>
-						<option value="dsa-struktur">DSA-Struktur-Korpus</option>
-						<option value="hamburg-dependency-treebank">Hamburg-DT</option>
-						<option value="dortmunder chat-korpus">DO Chat-Korpus (mit Datum)</option>
-						<option value="spiegel">Spiegel-Archiv (mit Datum)</option>
-						<option value="zeit">Zeit-Archiv (mit Datum)</option>
-						<option value="focus">Focus-Archiv (mit Datum)</option>
-						<option value="juice">Juice-Archiv (mit Datum)</option>
-						<option value="intro">Intro-Archiv (mit Datum)</option>
+						<option value="" <#if source == "">selected</#if>>Alle Quellen</option>
+						<option value="twitter" <#if source == "twitter">selected</#if>>Twitter-Korpus (mit Datum)</option>
+						<option value="wacky" <#if source == "wacky">selected</#if>>Wacky-Korpus</option>
+						<option value="dsa-struktur" <#if source == "dsa-struktur">selected</#if>>DSA-Struktur-Korpus</option>
+						<option value="hamburg-dependency-treebank" <#if source == "hamburg-dependency-treebank">selected</#if>>Hamburg-DT</option>
+						<option value="dortmunder chat-korpus" <#if source == "dortmunder chat-korpus">selected</#if>>DO Chat-Korpus (mit Datum)</option>
+						<option value="spiegel" <#if source == "spiegel">selected</#if>>Spiegel-Archiv (mit Datum)</option>
+						<option value="zeit" <#if source == "zeit">selected</#if>>Zeit-Archiv (mit Datum)</option>
+						<option value="focus" <#if source == "focus">selected</#if>>Focus-Archiv (mit Datum)</option>
+						<option value="juice" <#if source == "juice">selected</#if>>Juice-Archiv (mit Datum)</option>
+						<option value="intro" <#if source == "intro">selected</#if>>Intro-Archiv (mit Datum)</option>
 					</select>
 					<br/><br/>
-					<label for="lengthLimitInput">max. Zeichen / Kontext (0 = alles ausgeben):</label>&nbsp;
-					<input type="number" id="lengthLimitInput" name="lengthlimit" min="0" value='${lengthlimit!"500"}' />
+					<label for="lengthLimitInput">Zeichen vor und nach Fundstelle ausgeben:</label>&nbsp;
+					<input type="number" id="lengthLimitInput" name="lengthlimit" min="10" value='${lengthlimit!"200"}' />
+					<br/>
+					<label for="maxDistanceInput">max. Abstand mehrerer Suchbegriffe:</label>&nbsp;
+					<input type="number" id="maxDistanceInput" name="maxdistance" min="1" max="1000" value='${maxdistance!"100"}' />
 					<br/><br/>
 					<input id="searchButton" type="submit" value="Suchen" class="btn" />
 				</div>

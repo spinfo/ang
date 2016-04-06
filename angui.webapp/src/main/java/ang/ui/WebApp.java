@@ -9,6 +9,7 @@ import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +56,6 @@ public class WebApp implements spark.servlet.SparkApplication {
 		get("/search", (request, response) -> {
 			
 			//get params
-			boolean regex = request.queryParams("regex") != null;
 			boolean casesens = request.queryParams("casesens") != null;
 			boolean useyear = request.queryParams("useyear") != null;
 			String yearfrom = request.queryParams("yearfrom");
@@ -63,28 +63,26 @@ public class WebApp implements spark.servlet.SparkApplication {
 			String query = request.queryParams("query");
 			String source = request.queryParams("source");
 			String lengthlimit = request.queryParams("lengthlimit");
+			String maxdistance = request.queryParams("maxdistance");
 			
 			//defaults
 			source = (source == null ? "" : source);
 			query = (query == null ? "" : query);
-			lengthlimit = (lengthlimit == null ? "500" : lengthlimit);
+			lengthlimit = (lengthlimit == null ? "200" : lengthlimit);
 			yearfrom = (yearfrom == null ? "1516" : yearfrom);
 			yearto = (yearto == null ? "2020" : yearto);
+			maxdistance = (maxdistance == null ? "100" : maxdistance);
 			
 			//create model
 			Map<String, Object> model = new HashMap<String, Object>();
 			model.put("query", query);
 			model.put("source", source);
-			model.put("regex", regex);
 			model.put("casesens", casesens);
 			model.put("useyear", useyear);
 			model.put("yearfrom", yearfrom);
 			model.put("yearto", yearto);
 			model.put("lengthlimit", lengthlimit);
-			
-			System.out.println("[MODEL]\t" + model);
-
-
+			model.put("maxdistance", maxdistance);
 			
 			List<DBData> data = new ArrayList<DBData>();
 			
@@ -97,13 +95,12 @@ public class WebApp implements spark.servlet.SparkApplication {
 			
 			
 			if (query != null){
-				Pattern pattern = casesens ?
-						Pattern.compile(query)
-						: Pattern.compile(query, Pattern.CASE_INSENSITIVE);
+				String[] queries = splitQuery(query);
+				model.put("queries", queries);
+				Pattern[] patterns = generatePatterns(queries, casesens);
 				FindIterable<Document> results = mongo.getSearchResults(
 						query,
 						source,
-						regex,
 						casesens,
 						useyear,
 						Integer.parseInt(yearfrom),
@@ -111,10 +108,15 @@ public class WebApp implements spark.servlet.SparkApplication {
 				if (results != null){
 					for (Document doc : results){
 						String text = doc.getString("text");
-						String match = findMatch(doc.getString("text"), pattern);
-						text = trimText(text, match, Integer.parseInt(lengthlimit));
+						String[] matches = findMatches(doc.getString("text"), patterns);
+						text = trimText(
+								text,
+								matches,
+								Integer.parseInt(lengthlimit),
+								Integer.parseInt(maxdistance));
+						if (text == null) continue;
 						
-						data.add(new DBData(doc.getString("source"), text, match));
+						data.add(new DBData(doc.getString("source"), text));
 					}
 					model.put("results", data);
 				}
@@ -149,13 +151,33 @@ public class WebApp implements spark.servlet.SparkApplication {
 	}
 	
 	
-	private String findMatch(String text, Pattern pattern){
-		if (text == null || text.length() == 0) return "";
-		Matcher m = pattern.matcher(text);
-		if (!m.find()){
-			return "";
+	public Pattern[] generatePatterns(String[] queries, boolean casesens){
+		List<Pattern> patterns = new ArrayList<Pattern>();
+		for (String q : queries){
+			Pattern p = casesens ?
+					Pattern.compile(q)
+					: Pattern.compile(q, Pattern.CASE_INSENSITIVE);
+			patterns.add(p);
 		}
-		return m.group(0);
+		return patterns.toArray(new Pattern[patterns.size()]);
+	}
+	
+	
+	private String[] splitQuery(String query){
+		return query.replaceAll("[^\\p{L}\\s]", "").split("\\s");
+	}
+	
+	
+	private String[] findMatches(String text, Pattern[] patterns){
+		if (text == null || text.length() == 0) return new String[0];
+		List<String> matches = new ArrayList<String>();
+		for (Pattern p : patterns){
+			Matcher m = p.matcher(text);
+			if (m.find()){
+				matches.add(m.group(0));
+			}
+		}
+		return matches.toArray(new String[matches.size()]);
 	}
 	
 	
@@ -178,16 +200,41 @@ public class WebApp implements spark.servlet.SparkApplication {
 	}
 	
 	
-	private String trimText(String text, String match, int length){
-		if (text.length() > length + 10) {
-			int find = text.indexOf(match);
-			if (find == -1) return text;
-			int start = find - (length/2);
-			int end = find + (length/2);
+	private String trimText(String text,
+			String[] matches,
+			int length,
+			int maxdistance){
+		
+		int min = text.length()-1;
+		int max = 0;
+		int minLength = 0;
+		
+		//find first and last match boundaries
+		for (String m : matches){
+			int i = text.indexOf(m);
+			if (i != -1){
+				if (i < min){
+					min = i;
+					minLength = m.length();
+				}
+				if (i > max){
+					max = i;
+				}
+			}
+		}
+		
+		//return null if distance too long
+		if (max - min - minLength > maxdistance) return null;
+		
+		//trim text if needed
+		if (text.length() > (length*2) + (max-min)) {
+			int start = min - length;
+			int end = max + length;
 			start = start < 0 ? 0 : start;
 			end = end > (text.length() - 1) ? (text.length() - 1) : end;
 			text = "[...] " + text.substring(start, end) + " [...]";
 		}
+		
 		return text;
 	}
 	
@@ -195,13 +242,11 @@ public class WebApp implements spark.servlet.SparkApplication {
 	public class DBData {
 		private String source;
 		private String text;
-		private String match;
 		
-		public DBData(String source, String text, String match) {
+		public DBData(String source, String text) {
 			super();
 			this.source = (source == null ? "" : source);
 			this.text = (text == null ? "" : text);
-			this.match = (match == null ? "" : match);
 		}
 
 		public String getSource() {
@@ -210,10 +255,6 @@ public class WebApp implements spark.servlet.SparkApplication {
 
 		public String getText() {
 			return text;
-		}
-		
-		public String getMatch(){
-			return match;
 		}
 		
 	}
