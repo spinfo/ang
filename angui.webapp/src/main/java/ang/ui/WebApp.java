@@ -122,6 +122,7 @@ public class WebApp implements spark.servlet.SparkApplication {
 						data.add(new DBData(doc.getString("source"), text));
 					}
 					model.put("results", data);
+					model.put("resultscount", data.size());
 				}
 			}
 			

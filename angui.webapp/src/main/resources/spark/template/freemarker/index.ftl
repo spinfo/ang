@@ -151,16 +151,18 @@
 
 				<!-- RESULTS -->
 				<div id="resultsTitle" class="sixteen columns">
-					<span class="bold">Suchbegriff:</span> "${query}"
+					<span class="bold">Suchbegriff:</span> ${query}
 					&nbsp;&nbsp;&mdash;&nbsp;&nbsp;
 					<span class="bold">Quelle:</span>
 					<#if source?? && source != "">
-						"${source}"
+						${source}
 					<#else>
-						"alle Quellen"
+						alle Quellen
 					</#if>
 					&nbsp;&nbsp;&mdash;&nbsp;&nbsp;
-					<span id="exportButton" class="fakeLink">Tabelle als CSV (z.B. für MS Excel) exportieren</span>
+					<span class="bold">Fundstellen:</span> ${resultscount!"N/A"}
+					&nbsp;&nbsp;&mdash;&nbsp;&nbsp;
+					<span id="exportButton" class="fakeLink bold">Export als CSV</span>
 				</div>
 				
 				<#if results??>
@@ -179,8 +181,6 @@
 				</#if>
 
 			</div>
-		<#else>
-			<div class="textCenter" style="color: white; margin-top: 100px;">Bitte benutzen Sie die Suchfunktion!</div>
 		</#if>
 
 	</div>
