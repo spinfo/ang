@@ -65,7 +65,8 @@ public class MongoWrapper {
 			boolean casesens,
 			boolean useyear,
 			int yearfrom,
-			int yearto){
+			int yearto,
+			int limitresults){
 		
 		if (!isInitiated() || query == null || query.length() == 0) return null;
 		BasicDBObject q = new BasicDBObject();
@@ -94,7 +95,7 @@ public class MongoWrapper {
 		keys.put("text", 1);
 		keys.put("source", 1);
 		
-		return coll.find(q).projection(keys);
+		return coll.find(q).projection(keys).limit(limitresults);
 	}
 	
 	

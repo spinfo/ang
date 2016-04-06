@@ -49,7 +49,7 @@ public class WebApp implements spark.servlet.SparkApplication {
 		staticFileLocation("/spark/template/freemarker");
 		
 		//set port
-		port(8080);
+		//port(8080);
 		
 		// MAP /search
 		get("/search", (request, response) -> {
@@ -63,6 +63,7 @@ public class WebApp implements spark.servlet.SparkApplication {
 			String source = request.queryParams("source");
 			String lengthlimit = request.queryParams("lengthlimit");
 			String maxdistance = request.queryParams("maxdistance");
+			String limitresults = request.queryParams("limitresults");
 			
 			//defaults
 			source = (source == null ? "" : source);
@@ -71,6 +72,7 @@ public class WebApp implements spark.servlet.SparkApplication {
 			yearfrom = (yearfrom == null ? "1516" : yearfrom);
 			yearto = (yearto == null ? "2020" : yearto);
 			maxdistance = (maxdistance == null ? "100" : maxdistance);
+			limitresults = (limitresults == null ? "1000" : limitresults);
 			
 			//create model
 			Map<String, Object> model = new HashMap<String, Object>();
@@ -82,6 +84,7 @@ public class WebApp implements spark.servlet.SparkApplication {
 			model.put("yearto", yearto);
 			model.put("lengthlimit", lengthlimit);
 			model.put("maxdistance", maxdistance);
+			model.put("limitresults", limitresults);
 			
 			List<DBData> data = new ArrayList<DBData>();
 			
@@ -103,7 +106,8 @@ public class WebApp implements spark.servlet.SparkApplication {
 						casesens,
 						useyear,
 						Integer.parseInt(yearfrom),
-						Integer.parseInt(yearto));
+						Integer.parseInt(yearto),
+						Integer.parseInt(limitresults));
 				if (results != null){
 					for (Document doc : results){
 						String text = doc.getString("text");
