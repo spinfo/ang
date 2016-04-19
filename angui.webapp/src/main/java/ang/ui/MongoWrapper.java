@@ -75,7 +75,10 @@ public class MongoWrapper {
 		//search (regex or index)
 		if (regex){
 			//regex search
-			q.put("text", "/" + query + "/" + (casesens ? "" : "i"));
+			BasicDBObject regexQuery = new BasicDBObject();
+			regexQuery.put("$regex", query);
+			if (!casesens) regexQuery.put("$options", "i");
+			q.put("text", regexQuery);
 		} else {
 			//text search
 			BasicDBObject search = new BasicDBObject();

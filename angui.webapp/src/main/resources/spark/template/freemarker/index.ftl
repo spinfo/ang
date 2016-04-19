@@ -101,8 +101,8 @@
 					<label for="caseSensInput">Groß-/Kleinschreibung beachten:</label>&nbsp;
 					<input type="checkbox" id="caseSensInput" name="casesens" <#if casesens?? && casesens == true>checked</#if> />
 					<br/>
-					<label for="regexInput">Reguläre Ausdrücke verwenden:</label>&nbsp;
-					<input type="checkbox" id="regexInput" name="regex" <#if regex?? && regex == true>checked</#if> />
+					<label for="subStringsInput">Auch Wort-Teile suchen (langsam!):</label>&nbsp;
+					<input type="checkbox" id="subStringsInput" name="substrings" <#if substrings?? && substrings == true>checked</#if> />
 					<br/>
 					<label for="useYearInput">Quellen ohne / mit anderem Datum ausschließen:</label>&nbsp;
 					<input type="checkbox" id="useYearInput" name="useyear" <#if useyear?? && useyear == true>checked</#if> />
@@ -194,16 +194,16 @@
 		Suche nach einzelnem Begriff:<br/>
 		<span class="mono">drink</span><br/><br/>
 
-		Suche nach mehreren optionalen Begriffen:<br/>
+		Suche nach mehreren optionalen Begriffen (nur wenn "Auch Wort-Teile suchen" deaktiviert ist!):<br/>
 		<span class="mono">drink alkohol</span><br/><br/>
 
 		Suche nach mehreren erforderlichen Begriffen:<br/>
 		<span class="mono">"drink" "alkohol"</span><br/><br/>
 
-		Suche nach zusammenhängender Phrase:<br/>
+		Suche nach zusammenhängender Phrase (nur wenn "Auch Wort-Teile suchen" deaktiviert ist!):<br/>
 		<span class="mono">"drink alkohol"</span><br/><br/>
 
-		Bestimmte Begriffe (mit Minus-Prefix) ausschließen:<br/>
+		Bestimmte Begriffe ausschließen (nur wenn "Auch Wort-Teile suchen" deaktiviert ist!):<br/>
 		<span class="mono">drink -alkohol</span>
 	</div>
 

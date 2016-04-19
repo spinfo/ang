@@ -9,6 +9,7 @@ import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ public class WebApp implements spark.servlet.SparkApplication {
 	public void init() {
 		this.mongo = new MongoWrapper();
 		Properties props = loadProperties("db.properties");
+		
 		mongo.init(props.getProperty("user"),	//USER
 				props.getProperty("pw"),		//PASS
 				props.getProperty("db"),		//DB
@@ -53,11 +55,10 @@ public class WebApp implements spark.servlet.SparkApplication {
 		
 		// MAP /search
 		get("/search", (request, response) -> {
-			
 			//get params
 			boolean casesens = request.queryParams("casesens") != null;
-			boolean regex = request.queryParams("regex") != null;
 			boolean useyear = request.queryParams("useyear") != null;
+			boolean substrings = request.queryParams("substrings") != null;
 			String yearfrom = request.queryParams("yearfrom");
 			String yearto = request.queryParams("yearto");
 			String query = request.queryParams("query");
@@ -80,7 +81,7 @@ public class WebApp implements spark.servlet.SparkApplication {
 			model.put("query", query);
 			model.put("source", source);
 			model.put("casesens", casesens);
-			model.put("regex", regex);
+			model.put("substrings", substrings);
 			model.put("useyear", useyear);
 			model.put("yearfrom", yearfrom);
 			model.put("yearto", yearto);
@@ -90,30 +91,46 @@ public class WebApp implements spark.servlet.SparkApplication {
 			
 			List<DBData> data = new ArrayList<DBData>();
 			
-			//BLOCK FOR TESTING PURPOSES ONLY
-//			Pattern pTemp = Pattern.compile("twitter", Pattern.CASE_INSENSITIVE);
-//			data.add(new DBData("twitter", "Ich \"twitter\" das jetzt so!", findMatch("Ich twitter das jetzt so!", pTemp)));
-//			data.add(new DBData("dings", "Hahaha twitter! ich werd bekloppt!", findMatch("Hahaha twitter! ich werd bekloppt!", pTemp)));
-//			data.add(new DBData("quelle", "Och nööööö! Nicht Twitter!", findMatch("Och nööööö! Nicht Twitter!", pTemp)));
-//			model.put("results", data);
-			
-			
+			//process query
 			if (query != null){
+				System.out.println("\n=============\nQUERY: " + query);
+				
+				//split queries
 				String[] queries = splitQuery(query);
+				System.out.println("SPLIT QUERIES: " + Arrays.toString(queries));
 				model.put("queries", queries);
-				Pattern[] patterns = generatePatterns(queries, casesens);
+				
+				//process possible wildcards via regex
+				if (substrings){
+					query = parseRegexQuery(query);
+					System.out.println("QUERY REGEX: " + query);
+				}
+				
+				Pattern[] patterns = generatePatterns(
+						substrings ? new String[]{query} : queries, casesens);
+				System.out.println("PATTERNS: " + Arrays.toString(patterns) + "\n=============\n");
+				
 				FindIterable<Document> results = mongo.getSearchResults(
 						query,
 						source,
 						casesens,
-						regex,
+						substrings,
 						useyear,
 						Integer.parseInt(yearfrom),
 						Integer.parseInt(yearto),
 						Integer.parseInt(limitresults));
+				
 				if (results != null){
 					for (Document doc : results){
 						String text = doc.getString("text");
+						
+						//skip if one word is missing
+						boolean skip = false;
+						for(String q : queries)
+							if (!text.matches(".*(?i)" + q + ".*"))
+								skip = true;
+						if (skip) continue;
+						
 						String[] matches = findMatches(doc.getString("text"), patterns);
 						text = trimText(
 								text,
@@ -132,11 +149,13 @@ public class WebApp implements spark.servlet.SparkApplication {
 			return new ModelAndView(model, "index.ftl");
         }, new FreeMarkerEngine());
 		
+		
 		//MAP /search/
 		get("/search/", (request, response) -> {
 			response.redirect("/search");
 		    return null;
 		});
+		
 		
 		//MAP /
 		get("/", (request, response) -> {
@@ -144,16 +163,37 @@ public class WebApp implements spark.servlet.SparkApplication {
 		    return null;
 		});
 		
+		
 		//MAP /stopang
 		get("/stopang", (request, response) -> {
 		    return "von wegen.";
 		});
+		
 	}
 	
 	
 	public void exit(){
 		mongo.close();
 		stop();
+	}
+	
+	
+	private String parseRegexQuery(String query){
+		query = query.replaceAll("\\b(?=\\w)", "*")
+				.replaceAll("(?<=\\w)\\b", "*");
+		
+		//extract single words and generate options
+		String[] words = splitQuery(query);
+		String opt = "";
+		for (String s : words) opt += s + "|";
+		opt = "(" + opt.substring(0, opt.length()-1) + ")";
+		
+		return query.replaceAll("\\*", "%")
+			.replaceAll("\\%(?=\\w)", "\\\\b\\\\w*")
+			.replaceAll("(?<=\\w)\\%", "\\\\w*\\\\b")
+			.replaceAll("\\\"\\s\\\"", ".+")
+			.replaceAll("\\\"", "")
+			.replaceAll(opt, opt);
 	}
 	
 	
@@ -170,7 +210,8 @@ public class WebApp implements spark.servlet.SparkApplication {
 	
 	
 	private String[] splitQuery(String query){
-		return query.replaceAll("[^\\p{L}\\s]", "").split("\\s");
+		return query.replaceAll("\\.\\+", " ").replaceAll("\\\\\\w", "")
+				.replaceAll("[^\\p{L}\\s]", "").split("\\s");
 	}
 	
 	
