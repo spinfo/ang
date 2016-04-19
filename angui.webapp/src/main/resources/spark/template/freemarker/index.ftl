@@ -101,6 +101,9 @@
 					<label for="caseSensInput">Groß-/Kleinschreibung beachten:</label>&nbsp;
 					<input type="checkbox" id="caseSensInput" name="casesens" <#if casesens?? && casesens == true>checked</#if> />
 					<br/>
+					<label for="regexInput">Reguläre Ausdrücke verwenden:</label>&nbsp;
+					<input type="checkbox" id="regexInput" name="regex" <#if regex?? && regex == true>checked</#if> />
+					<br/>
 					<label for="useYearInput">Quellen ohne / mit anderem Datum ausschließen:</label>&nbsp;
 					<input type="checkbox" id="useYearInput" name="useyear" <#if useyear?? && useyear == true>checked</#if> />
 					<br/>

@@ -63,6 +63,7 @@ public class MongoWrapper {
 			String query,
 			String source,
 			boolean casesens,
+			boolean regex,
 			boolean useyear,
 			int yearfrom,
 			int yearto,
@@ -71,12 +72,18 @@ public class MongoWrapper {
 		if (!isInitiated() || query == null || query.length() == 0) return null;
 		BasicDBObject q = new BasicDBObject();
 		
-		//text search (regex or index)
-		BasicDBObject search = new BasicDBObject();
-		search.put("$search", query);
-		search.put("$caseSensitive", casesens);
-		search.put("$language", "none");
-		q.put("$text", search);
+		//search (regex or index)
+		if (regex){
+			//regex search
+			q.put("text", "/" + query + "/" + (casesens ? "" : "i"));
+		} else {
+			//text search
+			BasicDBObject search = new BasicDBObject();
+			search.put("$search", query);
+			search.put("$caseSensitive", casesens);
+			search.put("$language", "none");
+			q.put("$text", search);
+		}
 		
 		//source
 		if (source != null && source.length() > 0)
@@ -90,7 +97,7 @@ public class MongoWrapper {
 			q.put("date_year", year);
 		}
 		
-		//procetion
+		//projection
 		BasicDBObject keys = new BasicDBObject();
 		keys.put("text", 1);
 		keys.put("source", 1);

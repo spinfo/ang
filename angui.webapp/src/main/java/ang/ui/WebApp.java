@@ -1,7 +1,7 @@
 package ang.ui;
 
 import static spark.Spark.get;
-import static spark.Spark.port;
+//import static spark.Spark.port;
 import static spark.Spark.staticFileLocation;
 import static spark.Spark.stop;
 
@@ -56,6 +56,7 @@ public class WebApp implements spark.servlet.SparkApplication {
 			
 			//get params
 			boolean casesens = request.queryParams("casesens") != null;
+			boolean regex = request.queryParams("regex") != null;
 			boolean useyear = request.queryParams("useyear") != null;
 			String yearfrom = request.queryParams("yearfrom");
 			String yearto = request.queryParams("yearto");
@@ -79,6 +80,7 @@ public class WebApp implements spark.servlet.SparkApplication {
 			model.put("query", query);
 			model.put("source", source);
 			model.put("casesens", casesens);
+			model.put("regex", regex);
 			model.put("useyear", useyear);
 			model.put("yearfrom", yearfrom);
 			model.put("yearto", yearto);
@@ -104,6 +106,7 @@ public class WebApp implements spark.servlet.SparkApplication {
 						query,
 						source,
 						casesens,
+						regex,
 						useyear,
 						Integer.parseInt(yearfrom),
 						Integer.parseInt(yearto),
@@ -143,8 +146,7 @@ public class WebApp implements spark.servlet.SparkApplication {
 		
 		//MAP /stopang
 		get("/stopang", (request, response) -> {
-			exit();
-		    return null;
+		    return "von wegen.";
 		});
 	}
 	
