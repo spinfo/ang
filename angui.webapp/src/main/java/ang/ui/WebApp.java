@@ -94,6 +94,7 @@ public class WebApp implements spark.servlet.SparkApplication {
 			//process query
 			if (query != null){
 				System.out.println("\n=============\nQUERY: " + query);
+				boolean findAllQueries = query.contains("\"");
 				
 				//split queries
 				String[] queries = splitQuery(query);
@@ -126,9 +127,10 @@ public class WebApp implements spark.servlet.SparkApplication {
 						
 						//skip if one word is missing
 						boolean skip = false;
-						for(String q : queries)
-							if (!text.matches(".*(?i)" + q + ".*"))
-								skip = true;
+						if (findAllQueries)
+							for(String q : queries)
+								if (!text.toLowerCase().matches(".*(?i)" + q.toLowerCase() + ".*"))
+									skip = true;
 						if (skip) continue;
 						
 						String[] matches = findMatches(doc.getString("text"), patterns);

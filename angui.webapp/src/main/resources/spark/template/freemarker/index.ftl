@@ -194,7 +194,7 @@
 		Suche nach einzelnem Begriff:<br/>
 		<span class="mono">drink</span><br/><br/>
 
-		Suche nach mehreren optionalen Begriffen (nur wenn "Auch Wort-Teile suchen" deaktiviert ist!):<br/>
+		Suche nach mehreren optionalen Begriffen:<br/>
 		<span class="mono">drink alkohol</span><br/><br/>
 
 		Suche nach mehreren erforderlichen Begriffen:<br/>
