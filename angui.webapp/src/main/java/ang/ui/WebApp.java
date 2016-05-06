@@ -141,7 +141,11 @@ public class WebApp implements spark.servlet.SparkApplication {
 								Integer.parseInt(maxdistance));
 						if (text == null) continue;
 						
-						data.add(new DBData(doc.getString("source"), text));
+						data.add(new DBData(
+								doc.getString("source"),
+								text,
+								doc.getInteger("date_year", 0),
+								doc.getInteger("date_month", 0)));
 					}
 					model.put("results", data);
 					model.put("resultscount", data.size());
@@ -291,11 +295,15 @@ public class WebApp implements spark.servlet.SparkApplication {
 	public class DBData {
 		private String source;
 		private String text;
+		private String year;
+		private String month;
 		
-		public DBData(String source, String text) {
+		public DBData(String source, String text, int year, int month) {
 			super();
 			this.source = (source == null ? "" : source);
 			this.text = (text == null ? "" : text);
+			this.year = year <= 0 ? null : year+"";
+			this.month = month <= 0 ? null : month+"";
 		}
 
 		public String getSource() {
@@ -304,6 +312,14 @@ public class WebApp implements spark.servlet.SparkApplication {
 
 		public String getText() {
 			return text;
+		}
+		
+		public String getYear(){
+			return year;
+		}
+		
+		public String getMonth(){
+			return month;
 		}
 		
 	}

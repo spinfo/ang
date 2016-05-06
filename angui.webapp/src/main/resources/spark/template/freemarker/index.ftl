@@ -66,10 +66,14 @@
 				</#list>
 			</#if>
 
-			//TOGGLE SOURCES COLUMN
-			$(".toggleSources").click(function() {
+			//TOGGLE META COLUMNS
+			$(".toggleMeta").click(function() {
 				$(".columnSource").toggle();
 				$(".columnHeaderSource").toggle();
+				$(".columnYear").toggle();
+				$(".columnHeaderYear").toggle();
+				$(".columnMonth").toggle();
+				$(".columnHeaderMonth").toggle();
 			});
 
 			//EXPORT BUTTON
@@ -171,13 +175,17 @@
 				<#if results??>
 					<table id="tableResults" class="niceTable sixteenColumns">
 						<tr id="tableHeader">
-							<td class="columnHeaderText">Text <span class="toggleSources fakeLink">(Quellen ein/-ausblenden)</span></td>
+							<td class="columnHeaderText">Text <span class="toggleMeta fakeLink">(Metadaten ein/-ausblenden)</span></td>
 							<td class="columnHeaderSource">Quelle</td>
+							<td class="columnHeaderYear">Jahr</td>
+							<td class="columnHeaderMonth">Monat</td>
 						</tr>
 						<#list results as result>
 								<tr>
 									<td class="columnText" data-match='${result.match!""}'>${result.text!"(kein Text)"}</td>
 									<td class="columnSource">${result.source!"(keine Quelle)"}</td>
+									<td class="columnYear">${result.year!"(N/A)"}</td>
+									<td class="columnMonth">${result.month!"(N/A)"}</td>
 								</tr>
 						</#list>
 					</table>

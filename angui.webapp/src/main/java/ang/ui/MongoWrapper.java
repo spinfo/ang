@@ -104,6 +104,8 @@ public class MongoWrapper {
 		BasicDBObject keys = new BasicDBObject();
 		keys.put("text", 1);
 		keys.put("source", 1);
+		keys.put("date_year", 1);
+		keys.put("date_month", 1);
 		
 		return coll.find(q).projection(keys).limit(limitresults);
 	}
