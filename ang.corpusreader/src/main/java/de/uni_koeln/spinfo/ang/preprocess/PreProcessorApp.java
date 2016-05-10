@@ -10,12 +10,12 @@ public class PreProcessorApp {
 			return;
 		}
 		
-		AbstractPreProcessor pp = new DSAStrukturPreProcessor();
+		AbstractPreProcessor pp = new WackyPreProcessor();
 		//Properties props = IO.loadProperties("db.properties", pp.getClass());
 		//System.out.println(props);
 		
 		pp.process(args[0],
-				Patterns.FILE_NAME_ADD_EXTENSION + "txt", //file name pattern
+				"dewac_preproc", //file name pattern
 				"",	//USER
 				"",		//PASS
 				"ang",		//DB

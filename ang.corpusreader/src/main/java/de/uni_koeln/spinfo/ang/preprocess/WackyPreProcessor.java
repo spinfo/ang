@@ -30,7 +30,7 @@ public class WackyPreProcessor extends AbstractPreProcessor {
 				line = AngStringUtils.normalize(line);
 				
 				//Text in Sätze teilen
-				String[] texts = line.split("(?<=[.!?])\\s");
+				String[] texts = line.split("(?<=\\p{L}{2,}[.!?])\\s(?=\\D[^.!?]{40,})");
 				
 				for (String text : texts){
 					if (text.split("\\P{L}").length < 4) continue;
@@ -46,6 +46,7 @@ public class WackyPreProcessor extends AbstractPreProcessor {
 					obj.addData(CorpusObjectField.SOURCE_ARCHIVE_STRING, "dewac_preproc.gz");
 					obj.addData(CorpusObjectField.LENGTH_INT, text.length());
 					mongo.addDocument(obj.getBsonDocument());
+					System.out.println(text);
 				}
 			}
 		} catch (IOException e) {
