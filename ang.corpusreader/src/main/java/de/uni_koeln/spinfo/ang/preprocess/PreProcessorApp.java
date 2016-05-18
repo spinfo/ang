@@ -22,7 +22,6 @@ public class PreProcessorApp {
 				"localhost",		//HOST
 				"27017",		//PORT
 				"angdata");//COLLECTION
-		
 	}
 
 }
