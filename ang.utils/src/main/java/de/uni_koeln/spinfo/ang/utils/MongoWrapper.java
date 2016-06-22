@@ -1,7 +1,8 @@
 package de.uni_koeln.spinfo.ang.utils;
 
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.bson.Document;
 
@@ -15,7 +16,7 @@ import com.mongodb.client.MongoDatabase;
 
 public class MongoWrapper {
 	
-	private MongoClient mongoClient;
+	private static MongoClient mongoClient;
 	private MongoDatabase database;
 	private MongoCollection<Document> coll;
 
@@ -36,7 +37,9 @@ public class MongoWrapper {
 				"mongodb://" + user + ":" + pass
 				+ "@" + host + ":" + port
 				+ "/?authSource=" + db + "&authMechanism=SCRAM-SHA-1");
+		if (mongoClient != null) mongoClient.close();
 		mongoClient = new MongoClient(uri);
+		Logger.getLogger("org.mongodb.driver").setLevel(Level.WARNING);
 		database = mongoClient.getDatabase(db);
 		coll = database.getCollection(collection);
 	}
@@ -59,16 +62,101 @@ public class MongoWrapper {
 	}
 	
 	
-	public FindIterable<Document> getSearchResults(String queryRegex, String source){
-		if (!isInitiated() || queryRegex == null || queryRegex.length() == 0) return null;
+	public FindIterable<Document> getSearchResults(
+			String query,
+			String source,
+			boolean casesens,
+			boolean regex,
+			boolean useyear,
+			int yearfrom,
+			int yearto,
+			int limitresults){
 		
+		if (!isInitiated() || query == null || query.length() == 0) return null;
 		BasicDBObject q = new BasicDBObject();
-		q.put("text", Pattern.compile(queryRegex, Pattern.CASE_INSENSITIVE));
-		if (source != null) q.put("source", source);
 		
+		//search (regex or index)
+		if (regex){
+			//regex search
+			BasicDBObject regexQuery = new BasicDBObject();
+			regexQuery.put("$regex", query);
+			if (!casesens) regexQuery.put("$options", "i");
+			q.put("text", regexQuery);
+		} else {
+			//text search
+			BasicDBObject search = new BasicDBObject();
+			search.put("$search", query);
+			search.put("$caseSensitive", casesens);
+			search.put("$language", "none");
+			q.put("$text", search);
+		}
+		
+		//source
+		if (source != null && source.length() > 0)
+			q.put("source", source);
+		
+		//year
+		if (useyear){
+			BasicDBObject year = new BasicDBObject();
+			year.put("$gte", yearfrom);
+			year.put("$lte", yearto);
+			q.put("date_year", year);
+		}
+		
+		//projection
 		BasicDBObject keys = new BasicDBObject();
 		keys.put("text", 1);
 		keys.put("source", 1);
+		keys.put("date_year", 1);
+		keys.put("date_month", 1);
+		
+		return coll.find(q).projection(keys).limit(limitresults);
+	}
+	
+	
+	/**
+	 * search method used in DISCOWrapper class
+	 * @param query
+	 * @param source
+	 * @param yearfrom
+	 * @param yearto
+	 * @return
+	 */
+	public FindIterable<Document> getSearchResults(
+			String query,
+			String source,
+			int yearfrom,
+			int yearto,
+			boolean casesens){
+		
+		if (!isInitiated()) return null;
+		BasicDBObject q = new BasicDBObject();
+		
+		//search for word?
+		if (query != null){
+			//text search
+			BasicDBObject search = new BasicDBObject();
+			search.put("$search", query.toLowerCase());
+			search.put("$caseSensitive", casesens);
+			search.put("$language", "none");
+			q.put("$text", search);
+		}
+		
+		//source
+		if (source != null && source.length() > 0)
+			q.put("source", source);
+		
+		//year
+		if (yearfrom >= 0 && yearto >= 0){
+			BasicDBObject year = new BasicDBObject();
+			year.put("$gte", yearfrom);
+			year.put("$lte", yearto);
+			q.put("date_year", year);
+		}
+		
+		//projection
+		BasicDBObject keys = new BasicDBObject();
+		keys.put("text", 1);
 		
 		return coll.find(q).projection(keys);
 	}
