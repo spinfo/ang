@@ -13,6 +13,8 @@
 		<module>../ang.corpusreader</module>
 		<module>../ang.cse</module>
 		<module>../ang.generator</module>
+		<module>../ang.lucene</module>
+		<module>../ang.suite</module>
 	</modules>
 
 	<dependencies>
