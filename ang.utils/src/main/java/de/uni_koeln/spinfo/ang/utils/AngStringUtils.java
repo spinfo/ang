@@ -2,6 +2,9 @@ package de.uni_koeln.spinfo.ang.utils;
 
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
+import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AngStringUtils {
 	
@@ -30,7 +33,7 @@ public class AngStringUtils {
 		int max = -1;
 
 		for (int i = 0; i < tokens.length; i++) {
-			if (tokens[i].equals(around)) {
+			if (tokens[i].contains(around)) {
 				if (min == -1)
 					min = i;
 				max = i;
@@ -56,6 +59,20 @@ public class AngStringUtils {
 	    int exp = (int) (Math.log(bytes) / Math.log(unit));
 	    String pre = "KMGTPE".charAt(exp-1) + "i";
 	    return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+	}
+	
+	
+	public static String[] findIn(String findPattern, String inString){
+		Pattern pattern = Pattern.compile(findPattern);
+		Matcher matcher = pattern.matcher(inString);
+		String[] collect = new String[0];
+		
+		while (matcher.find()){
+			collect = Arrays.copyOf(collect, collect.length + 1);
+			collect[collect.length - 1] = matcher.group(0);
+		}
+		
+		return collect;
 	}
 
 	
