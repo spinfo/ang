@@ -41,7 +41,7 @@ public class DISCOWrapper {
 	private static final File DEFAULT_WORKING_DIR = new File("temp").getParentFile();
 	private static final long MAX_CORPUS_SIZE_FOR_ANALYSIS = 32000000;
 	private static final int JVM_MEMORY_DISCO_BUILDER_MB = 1024;
-	private static final int JVM_MEMORY_DISCO_MB = 1024;
+	private static final int JVM_MEMORY_DISCO_MB = 256;
 	private static final String OUTPUT_SECTION_SEPARATOR = "====================================";
 
 	private MongoWrapper mongo;
