@@ -19,13 +19,14 @@ public class JarExec {
 		StringBuilder sb = new StringBuilder();
 
 		// prepare process commands
-		String[] commands = new String[args.length + 4];
+		String[] commands = new String[args.length + 5];
 		commands[0] = "java";
 		commands[1] = "-Xmx" + memoryMb + "m";
-		commands[2] = "-jar";
-		commands[3] = jarPath;
-		for (int i = 4; i < commands.length; i++)
-			commands[i] = args[i - 4];
+		commands[2] = "-Xms" + memoryMb + "m";
+		commands[3] = "-jar";
+		commands[4] = jarPath;
+		for (int i = 5; i < commands.length; i++)
+			commands[i] = args[i - 5];
 
 		// prepare process object
 		ProcessBuilder pb = new ProcessBuilder(commands);
