@@ -28,6 +28,8 @@ import de.uni_koeln.spinfo.ang.utils.IO;
 import de.uni_koeln.spinfo.ang.utils.JarExec;
 import de.uni_koeln.spinfo.ang.utils.MongoWrapper;
 
+
+
 public class DISCOWrapper {
 
 	private static final String DISCO_JAR_PATH = "DISCO" + File.separator + "disco-2.1.jar";
@@ -40,7 +42,7 @@ public class DISCOWrapper {
 			+ "stopword-list_de_utf8.txt";
 	private static final File DEFAULT_WORKING_DIR = new File("temp").getParentFile();
 	private static final long MAX_CORPUS_SIZE_FOR_ANALYSIS = 32000000;
-	private static final int JVM_MEMORY_DISCO_BUILDER_MB = 1024;
+	private static final int JVM_MEMORY_DISCO_BUILDER_MB = 2024;
 	private static final int JVM_MEMORY_DISCO_MB = 256;
 	private static final String OUTPUT_SECTION_SEPARATOR = "====================================";
 
@@ -57,6 +59,9 @@ public class DISCOWrapper {
 	private boolean substrings;
 	private Map<String, Integer> composita;
 	private Set<String> stopWords;
+	private boolean useStopWords;
+	
+	
 
 	private void init() {
 		this.mongo = new MongoWrapper();
@@ -71,11 +76,13 @@ public class DISCOWrapper {
 	}
 
 	public File runAnalysis(String word, String dbQuery, String source, int yearFrom, int yearTo,
-			boolean substrings, int contextWordsLeftRight, int numberFeatureWords, boolean keepWordSpace) throws IOException {
+			boolean substrings, int contextWordsLeftRight, int numberFeatureWords,
+			boolean keepWordSpace, boolean useStopWords) throws IOException {
 		// init fields
 		this.word = word.toUpperCase();
 		this.dbQuery = (dbQuery != null ? dbQuery.toUpperCase() : null);
 		this.source = source;
+		this.useStopWords = useStopWords;
 		this.yearFrom = yearFrom;
 		this.yearTo = yearTo;
 		this.contextWordsLeftRight = contextWordsLeftRight;
@@ -149,9 +156,12 @@ public class DISCOWrapper {
 		File outputDir = new File(TEMP_CORPUS_PATH + runID);
 		outputDir.mkdirs();
 		
-		// get stopwords
-		stopWords = new HashSet<String>(
-				Arrays.asList(IO.readFile(STOPWORD_PATH).toUpperCase().split("\\P{L}+")));
+		// prep stopwords
+		stopWords = new HashSet<String>();
+		if (useStopWords){
+			Arrays.asList(IO.readFile(STOPWORD_PATH)
+					.toUpperCase().split("\\P{L}+"));
+		}
 		stopWords.add(source.toUpperCase());
 
 		// query db for data
@@ -166,22 +176,23 @@ public class DISCOWrapper {
 		}
 		
 		// write temporary corpus
-		FileWriter fw = new FileWriter(new File(
-				outputDir.getAbsolutePath() + File.separator + System.currentTimeMillis()));
 		for (Document doc : results) {
 			String text = doc.getString("text");
 			text = text.toUpperCase();
-			if (substrings)
-				text = seperateQuery(text, dbQuery);
+			if (substrings) text = seperateQuery(text, dbQuery);
 			text = removeTokens(stopWords, text);
-			if (dbQuery != null)
-				text = AngStringUtils.trimText(text, word, contextWordsLeftRight + 5);
-			if (text.length() < 5)
-				continue;
-			// write file
-			fw.write(text + "\n");
+			List<String> texts = AngStringUtils.trimTextMulti(text, word, contextWordsLeftRight + 2);
+			
+			FileWriter fw = new FileWriter(new File(
+					outputDir.getAbsolutePath() + File.separator
+					+ System.currentTimeMillis() + text.hashCode() + ".txt"));
+			
+			for (String t : texts){
+				if (t.length() < 5) continue;
+				fw.write(t + "\n");
+			}
+			fw.close();
 		}
-		fw.close();
 
 		System.out.println("Generated corpus '" + outputDir.getName() + "'. Size: "
 				+ AngStringUtils.humanReadableByteCount(IO.folderSize(outputDir.toPath())));
@@ -197,13 +208,7 @@ public class DISCOWrapper {
 
 		StringBuilder sb = new StringBuilder();
 		// results file header
-		sb.append("Analyse-Parameter:\nWort: " + word + "\nDB-Query: " + (dbQuery != null ? dbQuery : "-")
-				+ "\nQuelle: " + (source != null ? source : "alle")
-				+ "\nWort auch in Komposita suchen: " + (substrings ? "Ja" : "Nein")
-				+ "\nJahr von: " + (yearFrom == -1 ? "alle" : yearFrom)
-				+ "\nJahr bis: " + (yearTo == -1 ? "alle" : yearTo)
-				+ "\nWortkontext: " + contextWordsLeftRight * 2 + " Wörter");
-
+		sb.append(buildResultsHeader());
 		sb.append("\n\n\nAnalyse durch naive Methode\n" + "(häufigste Wörter im Umfeld, Stopwörter gefiltert)\n"
 				+ OUTPUT_SECTION_SEPARATOR + "\n");
 
@@ -212,10 +217,14 @@ public class DISCOWrapper {
 
 		// analyze
 		List<File> corpusFiles = IO.getAllFiles(corpusPath, null);
+		int occCount = 0;
 		for (File f : corpusFiles) {
-			for (String token : IO.readFile(f.getAbsolutePath()).split("\\P{L}+")) {
+			String content = IO.readFile(f.getAbsolutePath());
+			occCount += content.split("\n").length;
+			for (String token : content.split("\\P{L}+")) {
 				token = token.toUpperCase();
-				if (token.length() < 3 || token.contains(word) || stopWords.contains(token))
+				if (token.length() < 2 || token.contains(word)
+						|| (useStopWords && stopWords.contains(token)))
 					continue;
 				addToCountMap(results, token);
 			}
@@ -225,7 +234,7 @@ public class DISCOWrapper {
 		int count = 0;
 		for (Entry<String, Integer> e : results.entrySet()) {
 			if (count <= 20) {
-				sb.append(e.getKey() + "\t" + ((double) e.getValue() / (double) results.size()) + "\n");
+				sb.append(e.getKey() + "\t" + ((double) e.getValue() / (double) occCount) + "\n");
 			}
 			count++;
 		}
@@ -287,7 +296,6 @@ public class DISCOWrapper {
 	}
 
 	private String buildWordSpace(String corpusPath) throws IOException {
-
 		// create temp dir
 		File outputDir = new File(TEMP_WORDSPACE_PATH + runID);
 		if (!outputDir.exists())
@@ -416,6 +424,17 @@ public class DISCOWrapper {
 			from = from.replaceAll("\\b" + Pattern.quote(t) + "\\b", "");
 		}
 		return from.replaceAll("\\P{L}+", " ");
+	}
+	
+	
+	private String buildResultsHeader(){
+		return "Analyse-Parameter:\nWort: " + word + "\nDB-Query: " + (dbQuery != null ? dbQuery : "-")
+				+ "\nQuelle: " + (source != null ? source : "alle")
+				+ "\nWort auch in Komposita suchen: " + (substrings ? "Ja" : "Nein")
+				+ "\nJahr von: " + (yearFrom == -1 ? "alle" : yearFrom)
+				+ "\nJahr bis: " + (yearTo == -1 ? "alle" : yearTo)
+				+ "\nWortkontext: " + contextWordsLeftRight * 2 + " Wörter"
+				+ "\nStopwörter: " + (useStopWords ? "ja" : "nein");
 	}
 
 }

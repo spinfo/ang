@@ -44,7 +44,9 @@ public class Main {
 				Boolean.parseBoolean(params.get("-substrings")),	//substrings finden
 				Integer.parseInt(params.get("-context")),		//kontext-größe in eine richtung
 				Integer.parseInt(params.get("-mostfreq")),		//n häufigsten wörter einbeziehen
-				Boolean.parseBoolean(params.get("-keepwordspace")));			
+				Boolean.parseBoolean(params.get("-keepwordspace")),
+				Boolean.parseBoolean(params.get("-stopwords")));
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -64,6 +66,7 @@ public class Main {
 		params.put("-mostfreq", "30000");
 		params.put("-keepwordspace", "false");
 		params.put("-substrings", "false");
+		params.put("-stopwords", "true");
 		
 		for (Entry<String, String> e : params.entrySet()){
 			boolean found = false;
@@ -105,6 +108,7 @@ public class Main {
 				+ "-context\tcontext window size in one direction (number, optional. default = 5)\n"
 				+ "-mostfreq\ttake n most frequent words into account (number, optional, default = 50000)\n"
 				+ "-keepwordspace\t'true' or 'false' - decides whether word-space will be kept (optional, default = false)\n"
+				+ "-stopwords\t'true' or 'false' - decides whether stopwords are excluded (optional, default = true)\n"
 				);
 		
 	}
