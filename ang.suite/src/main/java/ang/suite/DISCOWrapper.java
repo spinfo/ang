@@ -27,6 +27,7 @@ import de.uni_koeln.spinfo.ang.utils.AngStringUtils;
 import de.uni_koeln.spinfo.ang.utils.IO;
 import de.uni_koeln.spinfo.ang.utils.JarExec;
 import de.uni_koeln.spinfo.ang.utils.MongoWrapper;
+import de.uni_koeln.spinfo.ang.utils.ProgressFeedback;
 
 
 
@@ -90,8 +91,8 @@ public class DISCOWrapper {
 		this.substrings = substrings;
 		this.composita = new HashMap<String, Integer>();
 		this.runID = buildRunID();
-
-		System.out.println("Starting analysis for: " + word);
+		
+		System.out.println(buildResultsHeader() + "\n");
 
 		// init monoDB connection
 		System.out.println("Initializing database connection...");
@@ -141,9 +142,9 @@ public class DISCOWrapper {
 		File wordSpace = null;
 		if (wordSpacePath != null)
 			wordSpace = new File(wordSpacePath);
-		if (!keepWordSpace && wordSpace != null && wordSpace.exists())
-			IO.deleteFolder(wordSpace.getParentFile());
-		IO.deleteFolder(new File(corpusPath));
+//		if (!keepWordSpace && wordSpace != null && wordSpace.exists())
+//			IO.deleteFolder(wordSpace.getParentFile());
+//		IO.deleteFolder(new File(corpusPath));
 
 		// write results to file
 		File resultsFile = new File(RESULTS_DIR_PATH + File.separator + runID + ".txt");
@@ -159,8 +160,8 @@ public class DISCOWrapper {
 		// prep stopwords
 		stopWords = new HashSet<String>();
 		if (useStopWords){
-			Arrays.asList(IO.readFile(STOPWORD_PATH)
-					.toUpperCase().split("\\P{L}+"));
+			stopWords.addAll(Arrays.asList(IO.readFile(STOPWORD_PATH)
+					.toUpperCase().split("\\P{L}+")));
 		}
 		stopWords.add(source.toUpperCase());
 
@@ -177,11 +178,10 @@ public class DISCOWrapper {
 		
 		// write temporary corpus
 		for (Document doc : results) {
-			String text = doc.getString("text");
-			text = text.toUpperCase();
+			String text = doc.getString("text").toUpperCase();
 			text = text.replaceAll("\\-", ""); //remove hyphens
-			text = removeTokens(stopWords, text); //remove stopwords
 			text = seperateQuery(text, dbQuery); //separate composites
+			text = removeTokens(stopWords, text); //remove stopwords
 			
 			//trim text to context windows
 			List<String> texts = AngStringUtils.trimTextMulti(
@@ -223,18 +223,20 @@ public class DISCOWrapper {
 
 		// analyze
 		List<File> corpusFiles = IO.getAllFiles(corpusPath, null);
+		ProgressFeedback pf = new ProgressFeedback("Naive Analysis", corpusFiles.size());
 		int occCount = 0;
 		for (File f : corpusFiles) {
 			String content = IO.readFile(f.getAbsolutePath());
 			occCount += content.split("\n").length;
 			for (String token : content.split("\\P{L}+")) {
 				token = token.toUpperCase();
-				if (token.length() < 2 || token.contains(word)
-						|| (useStopWords && stopWords.contains(token)))
-					continue;
+				if (token.length() < 2 || token.contains(word)) continue;
 				addToCountMap(results, token);
 			}
+			pf.step();
 		}
+		pf.end();
+		
 		results = sortByValue(results, false);
 		// delete all but 20 most frequent
 		int count = 0;
@@ -245,7 +247,7 @@ public class DISCOWrapper {
 			count++;
 		}
 		
-		//composita
+		//composites
 		if (substrings){
 			sb.append("\n\nGefundene (und berücksichtigte)\nKomposita und deren Häufigkeit\n" 
 					+ OUTPUT_SECTION_SEPARATOR + "\n");
