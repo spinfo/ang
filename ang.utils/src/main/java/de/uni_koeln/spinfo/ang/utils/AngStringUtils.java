@@ -2,7 +2,9 @@ package de.uni_koeln.spinfo.ang.utils;
 
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,6 +52,49 @@ public class AngStringUtils {
 		}
 
 		return sb.toString();
+	}
+	
+	
+	public static List<String> trimTextMulti(String text, String around, int contextNrOfWords) {
+		List<String> out = new ArrayList<String>();
+		
+		String[] tokens = text.split(" ");
+		int min;
+		int max;
+		int ind = -1;
+		int count = countContains(text, around);
+
+		while (count > 0){
+			for (int i = ind+1; i < tokens.length; i++) {
+				if (tokens[i].contains(around)) {
+					ind = i;
+					min = Math.max(ind - contextNrOfWords, 0);
+					max = Math.min(ind + contextNrOfWords, tokens.length);
+					
+					StringBuilder sb = new StringBuilder();
+					for (int j = min; j < max; j++) {
+						sb.append(tokens[j]);
+						sb.append(" ");
+					}
+					out.add(sb.toString());
+				}
+			}
+			count--;
+		}
+
+		return out;
+	}
+	
+	
+	private static int countContains(String string, String substring){
+		int count = 0;
+		String[] tokens = string.split(" ");
+		
+		for (int i = 0; i < tokens.length; i++) {
+			if (tokens[i].equals(substring)) count++;
+		}
+		
+		return count;
 	}
 	
 	
