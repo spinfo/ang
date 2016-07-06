@@ -179,14 +179,18 @@ public class DISCOWrapper {
 		for (Document doc : results) {
 			String text = doc.getString("text");
 			text = text.toUpperCase();
-			if (substrings) text = seperateQuery(text, dbQuery);
-			text = removeTokens(stopWords, text);
-			List<String> texts = AngStringUtils.trimTextMulti(text, word, contextWordsLeftRight + 2);
+			text = text.replaceAll("\\-", ""); //remove hyphens
+			text = removeTokens(stopWords, text); //remove stopwords
+			text = seperateQuery(text, dbQuery); //separate composites
 			
+			//trim text to context windows
+			List<String> texts = AngStringUtils.trimTextMulti(
+					text, word, contextWordsLeftRight + 2);
+			
+			//write text(s) to file
 			FileWriter fw = new FileWriter(new File(
 					outputDir.getAbsolutePath() + File.separator
 					+ System.currentTimeMillis() + text.hashCode() + ".txt"));
-			
 			for (String t : texts){
 				if (t.length() < 5) continue;
 				fw.write(t + "\n");
@@ -209,7 +213,9 @@ public class DISCOWrapper {
 		StringBuilder sb = new StringBuilder();
 		// results file header
 		sb.append(buildResultsHeader());
-		sb.append("\n\n\nAnalyse durch naive Methode\n" + "(häufigste Wörter im Umfeld, Stopwörter gefiltert)\n"
+		sb.append("\n\n\nAnalyse durch naive Methode\n"
+				+ "(häufigste Wörter im Umfeld, Stopwörter gefiltert)\n"
+				+ "Wert = Anteil der Fundstellen, in deren Kontext das Wort vorkommt\n"
 				+ OUTPUT_SECTION_SEPARATOR + "\n");
 
 		// create results map
