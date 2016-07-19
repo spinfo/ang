@@ -142,9 +142,9 @@ public class DISCOWrapper {
 		File wordSpace = null;
 		if (wordSpacePath != null)
 			wordSpace = new File(wordSpacePath);
-//		if (!keepWordSpace && wordSpace != null && wordSpace.exists())
-//			IO.deleteFolder(wordSpace.getParentFile());
-//		IO.deleteFolder(new File(corpusPath));
+		if (!keepWordSpace && wordSpace != null && wordSpace.exists())
+			IO.deleteFolder(wordSpace.getParentFile());
+		IO.deleteFolder(new File(corpusPath));
 
 		// write results to file
 		File resultsFile = new File(RESULTS_DIR_PATH + File.separator + runID + ".txt");
