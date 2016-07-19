@@ -35,7 +35,8 @@ public class Main {
 		
 		try {
 			resultsFile = disco.runAnalysis(
-				(String)params.get("-word"),		//wort
+					(String)params.get("-word1"),		//wort
+					(String)params.get("-word2"),		//wort
 				//(String)params.get("-query"),		//Query-Ausdruck
 				(String)params.get("-word"),		//TEMP: immer wort als query verwenden
 				(String)params.get("-source"),					//quelle
@@ -57,7 +58,8 @@ public class Main {
 	private static Map<String, String> processParams(String[] args){
 		Map<String, String> params = new HashMap<String, String>();
 		//defaults
-		params.put("-word", "required");
+		params.put("-word1", "required");
+		params.put("-word2", null);
 		params.put("-query", null);
 		params.put("-source", null);
 		params.put("-from", "-1");
@@ -99,7 +101,8 @@ public class Main {
 				+ "[ERROR]\tinvalid set of parameters! see usage directions:\n"
 				+ "*********************************************************\n"
 				+ "PARAMETER\t\tVALUE\n"
-				+ "-word\tmain word to analyze (required)\n"
+				+ "-word1\tmain word to analyze (required)\n"
+				+ "-word2\tword to compare word1 to (optional)\n"
 				+ "-source\tsource to build word-space from (optional, default = all sources)\n"
 				//+ "-query\tquery expression to build more relevant word-space (optional, but recommended)\n"
 				+ "-from\tfrom year (number) to limit used corpora to certain time range (optional)\n"

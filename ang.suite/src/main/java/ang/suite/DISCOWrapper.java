@@ -49,7 +49,8 @@ public class DISCOWrapper {
 
 	private MongoWrapper mongo;
 
-	private String word;
+	private String word1;
+	private String word2;
 	private String dbQuery;
 	private String source;
 	private int yearFrom;
@@ -76,11 +77,12 @@ public class DISCOWrapper {
 				props.getProperty("collection"));// COLLECTION
 	}
 
-	public File runAnalysis(String word, String dbQuery, String source, int yearFrom, int yearTo,
+	public File runAnalysis(String word1, String word2, String dbQuery, String source, int yearFrom, int yearTo,
 			boolean substrings, int contextWordsLeftRight, int numberFeatureWords,
 			boolean keepWordSpace, boolean useStopWords) throws IOException {
 		// init fields
-		this.word = word.toUpperCase();
+		this.word1 = word1.toUpperCase();
+		this.word2 = word2.toUpperCase();
 		this.dbQuery = (dbQuery != null ? dbQuery.toUpperCase() : null);
 		this.source = source;
 		this.useStopWords = useStopWords;
@@ -165,22 +167,34 @@ public class DISCOWrapper {
 		}
 		stopWords.add(source.toUpperCase());
 
+		//build corpus
+		buildCorpus(word1, outputDir);
+		if (word2 != null && word2.length() > 1)
+			buildCorpus(word2, outputDir);
+
+		System.out.println("Generated corpus '" + outputDir.getName() + "'. Size: "
+				+ AngStringUtils.humanReadableByteCount(IO.folderSize(outputDir.toPath())));
+		return outputDir.getAbsolutePath();
+		// return new File("DISCO/test-corpus-dewac").getAbsolutePath();
+	}
+	
+	private void buildCorpus(String word, File outputDir) throws IOException{
 		// query db for data
 		FindIterable<Document> results;
 		if (substrings){
 			results = mongo.getSearchResults(
-					parseRegexQuery(dbQuery), source, false, true,
+					parseRegexQuery(word), source, false, true,
 					(yearFrom > -1 && yearTo > -1), yearFrom, yearTo, 25000);
 		} else {
 			results = mongo.getSearchResults(
-					dbQuery, source, yearFrom, yearTo, false);
+					word, source, yearFrom, yearTo, false);
 		}
 		
 		// write temporary corpus
 		for (Document doc : results) {
 			String text = doc.getString("text").toUpperCase();
 			text = text.replaceAll("\\-", ""); //remove hyphens
-			text = seperateQuery(text, dbQuery); //separate composites
+			text = seperateQuery(text, word); //separate composites
 			text = removeTokens(stopWords, text); //remove stopwords
 			
 			//trim text to context windows
@@ -197,11 +211,6 @@ public class DISCOWrapper {
 			}
 			fw.close();
 		}
-
-		System.out.println("Generated corpus '" + outputDir.getName() + "'. Size: "
-				+ AngStringUtils.humanReadableByteCount(IO.folderSize(outputDir.toPath())));
-		return outputDir.getAbsolutePath();
-		// return new File("DISCO/test-corpus-dewac").getAbsolutePath();
 	}
 
 	private String runNaiveAnalysis(String corpusPath) {
@@ -230,7 +239,7 @@ public class DISCOWrapper {
 			occCount += content.split("\n").length;
 			for (String token : content.split("\\P{L}+")) {
 				token = token.toUpperCase();
-				if (token.length() < 2 || token.contains(word)) continue;
+				if (token.length() < 2 || token.contains(word1)) continue;
 				addToCountMap(results, token);
 			}
 			pf.step();
@@ -284,14 +293,30 @@ public class DISCOWrapper {
 		// JVM_MEMORY_DISCO_MB, false));
 
 		// run DISCO -bc
-		sb.append("\n\nSignifikanteste Kollokationen zu " + word + ":\n" + OUTPUT_SECTION_SEPARATOR + "\n");
+		sb.append("\n\nSignifikanteste Kollokationen zu " + word1 + ":\n" + OUTPUT_SECTION_SEPARATOR + "\n");
 		sb.append(JarExec.runJar(DISCO_JAR_PATH, DEFAULT_WORKING_DIR,
-				new String[] { wordSpacePath, "-bc", word, "20" }, JVM_MEMORY_DISCO_MB, false));
+				new String[] { wordSpacePath, "-bc", word1, "20" }, JVM_MEMORY_DISCO_MB, false));
 
 		// run DISCO -f
-		sb.append("\n\nKorpus-Häufigkeit von " + word + ":\n");
-		sb.append(JarExec.runJar(DISCO_JAR_PATH, DEFAULT_WORKING_DIR, new String[] { wordSpacePath, "-f", word },
+		sb.append("\n\nKorpus-Häufigkeit von " + word1 + ":\n");
+		sb.append(JarExec.runJar(DISCO_JAR_PATH, DEFAULT_WORKING_DIR, new String[] { wordSpacePath, "-f", word1 },
 				JVM_MEMORY_DISCO_MB, false));
+		
+		// run DISCO -s2
+		sb.append("\n\nSemantische Ähnlichkeit zweiter Ordnung von \""
+		+ word1 + "\" und \"" + word2 + "\":\n");
+		sb.append(
+		JarExec.runJar(DISCO_JAR_PATH, DEFAULT_WORKING_DIR,
+		new String[] { wordSpacePath, "-s2", word1, word2},
+		JVM_MEMORY_DISCO_MB, false));
+		
+		// run DISCO -cc
+		sb.append("\n\nGemeinsamer Kontext von \""
+		+ word1 + "\" und \"" + word2 + "\":\n");
+		sb.append(
+		JarExec.runJar(DISCO_JAR_PATH, DEFAULT_WORKING_DIR,
+		new String[] { wordSpacePath, "-cc", word1, word2},
+		JVM_MEMORY_DISCO_MB, false));
 
 		// run DISCO -f
 		// sb.append("\n\nAnzahl der abgefragten Wörter:\n");
@@ -363,7 +388,7 @@ public class DISCOWrapper {
 	 * run id for file names and temporary directory names
 	 */
 	private String buildRunID() {
-		return word
+		return word1
 				//+ (dbQuery == null ? "" : "_Q-" + dbQuery)
 				+ (source == null ? "" : "_" + source)
 				+ (yearFrom + yearTo == -2 ? "" : "_[" + yearFrom + "-" + yearTo + "]") + "_" + contextWordsLeftRight
@@ -436,7 +461,7 @@ public class DISCOWrapper {
 	
 	
 	private String buildResultsHeader(){
-		return "Analyse-Parameter:\nWort: " + word + "\nDB-Query: " + (dbQuery != null ? dbQuery : "-")
+		return "Analyse-Parameter:\nWort: " + word1 + "\nDB-Query: " + (dbQuery != null ? dbQuery : "-")
 				+ "\nQuelle: " + (source != null ? source : "alle")
 				+ "\nWort auch in Komposita suchen: " + (substrings ? "Ja" : "Nein")
 				+ "\nJahr von: " + (yearFrom == -1 ? "alle" : yearFrom)
