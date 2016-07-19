@@ -303,6 +303,14 @@ public class DISCOWrapper {
 				JVM_MEMORY_DISCO_MB, false));
 		
 		// run DISCO -s2
+		sb.append("\n\nSemantische Ähnlichkeit erster Ordnung von \""
+		+ word1 + "\" und \"" + word2 + "\":\n");
+		sb.append(
+		JarExec.runJar(DISCO_JAR_PATH, DEFAULT_WORKING_DIR,
+		new String[] { wordSpacePath, "-s", word1, word2, "SIM"},
+		JVM_MEMORY_DISCO_MB, false));
+		
+		// run DISCO -s2
 		sb.append("\n\nSemantische Ähnlichkeit zweiter Ordnung von \""
 		+ word1 + "\" und \"" + word2 + "\":\n");
 		sb.append(
