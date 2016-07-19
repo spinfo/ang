@@ -303,11 +303,11 @@ public class DISCOWrapper {
 				JVM_MEMORY_DISCO_MB, false));
 		
 		// run DISCO -s2
-		sb.append("\n\nSemantische Ähnlichkeit erster Ordnung von \""
+		sb.append("\n\nSemantische Ähnlichkeit erster Ordnung (Cosinus-Distanz) von \""
 		+ word1 + "\" und \"" + word2 + "\":\n");
 		sb.append(
 		JarExec.runJar(DISCO_JAR_PATH, DEFAULT_WORKING_DIR,
-		new String[] { wordSpacePath, "-s", word1, word2, "SIM"},
+		new String[] { wordSpacePath, "-s", word1, word2, "COSINE"},
 		JVM_MEMORY_DISCO_MB, false));
 		
 		// run DISCO -s2
