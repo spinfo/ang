@@ -388,7 +388,7 @@ public class DISCOWrapper {
 	 * run id for file names and temporary directory names
 	 */
 	private String buildRunID() {
-		return word1
+		return word1 + (word2 != null ? "_" + word2 : "")
 				//+ (dbQuery == null ? "" : "_Q-" + dbQuery)
 				+ (source == null ? "" : "_" + source)
 				+ (yearFrom + yearTo == -2 ? "" : "_[" + yearFrom + "-" + yearTo + "]") + "_" + contextWordsLeftRight
@@ -461,7 +461,11 @@ public class DISCOWrapper {
 	
 	
 	private String buildResultsHeader(){
-		return "Analyse-Parameter:\nWort: " + word1 + "\nDB-Query: " + (dbQuery != null ? dbQuery : "-")
+		return "Analyse-Parameter:"
+				+ "\nWort1: " + word1
+				+ "\nWort2: " + (word2 == null ? "-" : word2)
+				+ "\nDB-Query1: " + (word1 != null ? word1 : "-")
+				+ "\nDB-Query2: " + (word2 != null ? word2 : "-")
 				+ "\nQuelle: " + (source != null ? source : "alle")
 				+ "\nWort auch in Komposita suchen: " + (substrings ? "Ja" : "Nein")
 				+ "\nJahr von: " + (yearFrom == -1 ? "alle" : yearFrom)
