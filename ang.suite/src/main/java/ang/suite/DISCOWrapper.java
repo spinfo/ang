@@ -168,13 +168,14 @@ public class DISCOWrapper {
 		if (word2 != null && word2.length() > 1)
 			buildCorpus(word2, outputDir);
 
-		System.out.println("Generated corpus '" + outputDir.getName() + "'. Size: "
+		System.out.println("[INFO] total corpus size: "
 				+ AngStringUtils.humanReadableByteCount(IO.folderSize(outputDir.toPath())));
 		return outputDir.getAbsolutePath();
 		// return new File("DISCO/test-corpus-dewac").getAbsolutePath();
 	}
 	
 	private void buildCorpus(String word, File outputDir) throws IOException{
+		System.out.print("[INFO] generating corpus for \"" + word + "\"... ");
 		// query db for data
 		FindIterable<Document> results;
 		if (substrings){
@@ -188,6 +189,7 @@ public class DISCOWrapper {
 		
 		//create temporary corpus
 		StringBuilder sb = new StringBuilder();
+		int occCount = 0;
 		for (Document doc : results) {
 			String text = doc.getString("text").toUpperCase();
 			text = text.replaceAll("\\-", ""); //remove hyphens
@@ -202,6 +204,7 @@ public class DISCOWrapper {
 			for (String t : texts){
 				if (t.length() < 5) continue;
 				sb.append(t + "\n");
+				occCount++;
 			}
 		}
 		//write file
@@ -210,6 +213,7 @@ public class DISCOWrapper {
 				+ System.currentTimeMillis() + results.hashCode() + ".txt"));
 		fw.write(sb.toString());
 		fw.close();
+		System.out.println("[found: " + occCount + " times]");
 	}
 
 	private String runNaiveAnalysis(String corpusPath) {
