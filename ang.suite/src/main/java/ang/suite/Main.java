@@ -35,8 +35,8 @@ public class Main {
 		
 		try {
 			resultsFile = disco.runAnalysis(
-					(String)params.get("-word1"),		//wort
-					(String)params.get("-word2"),		//wort
+				(String)params.get("-word1"),		//wort
+				(String)params.get("-word2"),		//wort
 				//(String)params.get("-query"),		//Query-Ausdruck
 				(String)params.get("-word"),		//TEMP: immer wort als query verwenden
 				(String)params.get("-source"),					//quelle
