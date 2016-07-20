@@ -101,6 +101,7 @@ public class Main {
 				+ "[ERROR]\tinvalid set of parameters! see usage directions:\n"
 				+ "*********************************************************\n"
 				+ "PARAMETER\t\tVALUE\n"
+				+ "-batch [path to text file containing commands list]\n"
 				+ "-word1\tmain word to analyze (required)\n"
 				+ "-word2\tword to compare word1 to (optional)\n"
 				+ "-source\tsource to build word-space from (optional, default = all sources)\n"
