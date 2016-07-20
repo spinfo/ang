@@ -106,19 +106,17 @@ public class DISCOWrapper {
 		// look for existing word spaces with same criteria
 		String wordSpacePath = null;
 		String corpusPath = null;
-		File ws = new File(TEMP_WORDSPACE_PATH + File.separator + runID);
-		if (ws.exists() && ws.isDirectory()) {
-			wordSpacePath = ws.getAbsolutePath();
-		} else {
-			// build corpus
-			System.out.println("Building corpus...");
-			corpusPath = buildCorpus();
+		
+		// build corpus
+		System.out.println("Building corpus...");
+		corpusPath = buildCorpus();
 
-			if (IO.folderSize(new File(corpusPath).toPath()) <= MAX_CORPUS_SIZE_FOR_ANALYSIS) {
-				// build word-space with DISCOBuilder
-				System.out.println("Building word-space...");
-				wordSpacePath = buildWordSpace(corpusPath);
-			}
+		if (IO.folderSize(new File(corpusPath).toPath()) <= MAX_CORPUS_SIZE_FOR_ANALYSIS) {
+			// build word-space with DISCOBuilder
+			System.out.println("Building word-space...");
+			wordSpacePath = buildWordSpace(corpusPath);
+		} else {
+			System.out.println("[WARNING] corpus size exceeds maximum for vector analysis!");
 		}
 
 		System.out.println("Running naive analysis...");
@@ -130,9 +128,7 @@ public class DISCOWrapper {
 			// run vector analysis via DISCO
 			analysisResults += runVectorAnalysis(wordSpacePath);
 		} else {
-			System.out.println("Skipping DISCO analysis because of corpus size: "
-					+ AngStringUtils.humanReadableByteCount(IO.folderSize(new File(corpusPath).toPath()))
-					+ " (maximum set to " + AngStringUtils.humanReadableByteCount(MAX_CORPUS_SIZE_FOR_ANALYSIS) + ")");
+			System.out.println("Skipping DISCO analysis - wordspace could not be created!");
 		}
 
 		System.out.println("done.\n");
@@ -190,7 +186,8 @@ public class DISCOWrapper {
 					word, source, yearFrom, yearTo, false);
 		}
 		
-		// write temporary corpus
+		//create temporary corpus
+		StringBuilder sb = new StringBuilder();
 		for (Document doc : results) {
 			String text = doc.getString("text").toUpperCase();
 			text = text.replaceAll("\\-", ""); //remove hyphens
@@ -202,15 +199,17 @@ public class DISCOWrapper {
 					text, word, contextWordsLeftRight + 2);
 			
 			//write text(s) to file
-			FileWriter fw = new FileWriter(new File(
-					outputDir.getAbsolutePath() + File.separator
-					+ System.currentTimeMillis() + text.hashCode() + ".txt"));
 			for (String t : texts){
 				if (t.length() < 5) continue;
-				fw.write(t + "\n");
+				sb.append(t + "\n");
 			}
-			fw.close();
 		}
+		//write file
+		FileWriter fw = new FileWriter(new File(
+				outputDir.getAbsolutePath() + File.separator
+				+ System.currentTimeMillis() + results.hashCode() + ".txt"));
+		fw.write(sb.toString());
+		fw.close();
 	}
 
 	private String runNaiveAnalysis(String corpusPath) {
@@ -236,10 +235,14 @@ public class DISCOWrapper {
 		int occCount = 0;
 		for (File f : corpusFiles) {
 			String content = IO.readFile(f.getAbsolutePath());
-			occCount += content.split("\n").length;
+			//occCount += content.split("\n").length;
 			for (String token : content.split("\\P{L}+")) {
 				token = token.toUpperCase();
-				if (token.length() < 2 || token.contains(word1)) continue;
+				if (token.length() < 3) continue;
+				if (token.contains(word1)){
+					occCount++;
+					continue;
+				}
 				addToCountMap(results, token);
 			}
 			pf.step();
