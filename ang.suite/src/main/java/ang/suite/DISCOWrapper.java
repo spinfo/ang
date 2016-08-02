@@ -43,8 +43,8 @@ public class DISCOWrapper {
 			+ "stopword-list_de_utf8.txt";
 	private static final File DEFAULT_WORKING_DIR = new File("temp").getParentFile();
 	private static final long MAX_CORPUS_SIZE_FOR_ANALYSIS = 32000000;
-	private static final int JVM_MEMORY_DISCO_BUILDER_MB = 2024;
-	private static final int JVM_MEMORY_DISCO_MB = 256;
+	private static final int JVM_MEMORY_DISCO_BUILDER_MB = 2048;
+	private static final int JVM_MEMORY_DISCO_MB = 512;
 	private static final String OUTPUT_SECTION_SEPARATOR = "====================================";
 
 	private MongoWrapper mongo;
@@ -59,7 +59,7 @@ public class DISCOWrapper {
 	private int numberFeatureWords;
 	private String runID;
 	private boolean substrings;
-	private Map<String, Integer> composita;
+	private Map<String, Integer> compounds;
 	private Set<String> stopWords;
 	private boolean useStopWords;
 	
@@ -82,7 +82,7 @@ public class DISCOWrapper {
 			boolean keepWordSpace, boolean useStopWords) throws IOException {
 		// init fields
 		this.word1 = word1.toUpperCase();
-		this.word2 = word2.toUpperCase();
+		this.word2 = word2 != null ? word2.toUpperCase() : null;
 		this.dbQuery = (dbQuery != null ? dbQuery.toUpperCase() : null);
 		this.source = source;
 		this.useStopWords = useStopWords;
@@ -91,7 +91,7 @@ public class DISCOWrapper {
 		this.contextWordsLeftRight = contextWordsLeftRight;
 		this.numberFeatureWords = numberFeatureWords;
 		this.substrings = substrings;
-		this.composita = new HashMap<String, Integer>();
+		this.compounds = new HashMap<String, Integer>();
 		this.runID = buildRunID();
 		
 		System.out.println(buildResultsHeader() + "\n");
@@ -158,15 +158,16 @@ public class DISCOWrapper {
 		// prep stopwords
 		stopWords = new HashSet<String>();
 		if (useStopWords){
+			System.out.print("[INFO] building stopword list... ");
 			stopWords.addAll(Arrays.asList(IO.readFile(STOPWORD_PATH)
-					.toUpperCase().split("\\P{L}+")));
+					.toUpperCase().split("\n")));
+			System.out.println("(" + stopWords.size() + " words)");
 		}
-		stopWords.add(source.toUpperCase());
+		if (source != null) stopWords.add(source.toUpperCase());
 
 		//build corpus
 		buildCorpus(word1, outputDir);
-		if (word2 != null && word2.length() > 1)
-			buildCorpus(word2, outputDir);
+		if (word2 != null && word2.length() > 1) buildCorpus(word2, outputDir);
 
 		System.out.println("[INFO] total corpus size: "
 				+ AngStringUtils.humanReadableByteCount(IO.folderSize(outputDir.toPath())));
@@ -192,16 +193,21 @@ public class DISCOWrapper {
 		int occCount = 0;
 		for (Document doc : results) {
 			String text = doc.getString("text").toUpperCase();
-			text = text.replaceAll("\\-", ""); //remove hyphens
+			text = text.replaceAll("\\-", " "); //remove hyphens
+			if (!substrings && !text.matches(".*\\b" + word + "\\b.*")) continue; //ignore if only compounds were found
 			text = seperateQuery(text, word); //separate composites
+			text = text.replaceAll("\\P{L}+", " ").trim();
 			text = removeTokens(stopWords, text); //remove stopwords
 			
 			//trim text to context windows
 			List<String> texts = AngStringUtils.trimTextMulti(
-					text, word, contextWordsLeftRight + 2);
+					text, word, contextWordsLeftRight + 1);
+			
+			//System.out.print("\rWord found in text: " + texts.size() + " times.");
 			
 			//write text(s) to file
 			for (String t : texts){
+				//System.out.print("\r" + t);
 				if (t.length() < 5) continue;
 				sb.append(t + "\n");
 				occCount++;
@@ -210,10 +216,10 @@ public class DISCOWrapper {
 		//write file
 		FileWriter fw = new FileWriter(new File(
 				outputDir.getAbsolutePath() + File.separator
-				+ System.currentTimeMillis() + results.hashCode() + ".txt"));
+				+ word.replaceAll("\\W", "") + ".txt"));
 		fw.write(sb.toString());
 		fw.close();
-		System.out.println("[found: " + occCount + " times]");
+		System.out.println("(found: " + occCount + " times)");
 	}
 
 	private String runNaiveAnalysis(String corpusPath) {
@@ -225,8 +231,7 @@ public class DISCOWrapper {
 		StringBuilder sb = new StringBuilder();
 		// results file header
 		sb.append(buildResultsHeader());
-		sb.append("\n\n\nAnalyse durch naive Methode\n"
-				+ "(häufigste Wörter im Umfeld, Stopwörter gefiltert)\n"
+		sb.append("\n\n\nKollokationen: Analyse durch naive Methode\n"
 				+ "Wert = Anteil der Fundstellen, in deren Kontext das Wort vorkommt\n"
 				+ OUTPUT_SECTION_SEPARATOR + "\n");
 
@@ -240,14 +245,16 @@ public class DISCOWrapper {
 		for (File f : corpusFiles) {
 			String content = IO.readFile(f.getAbsolutePath());
 			//occCount += content.split("\n").length;
-			for (String token : content.split("\\P{L}+")) {
-				token = token.toUpperCase();
-				if (token.length() < 3) continue;
-				if (token.contains(word1)){
-					occCount++;
-					continue;
+			for (String text : content.split("\n")){
+				if (!text.contains(word1)) continue;
+				for (String token : text.split("\\P{L}+")) {
+					if (token.length() < 3) continue;
+					if (token.contains(word1)){
+						occCount++;
+						continue;
+					}
+					addToCountMap(results, token);
 				}
-				addToCountMap(results, token);
 			}
 			pf.step();
 		}
@@ -263,12 +270,12 @@ public class DISCOWrapper {
 			count++;
 		}
 		
-		//composites
+		//compunds
 		if (substrings){
 			sb.append("\n\nGefundene (und berücksichtigte)\nKomposita und deren Häufigkeit\n" 
 					+ OUTPUT_SECTION_SEPARATOR + "\n");
-			composita = sortByValue(composita, false);
-			for (Entry<String, Integer> e : composita.entrySet()) {
+			compounds = sortByValue(compounds, false);
+			for (Entry<String, Integer> e : compounds.entrySet()) {
 				sb.append(e.getKey() + "\t" + e.getValue() + "\n");
 			} 
 		}
@@ -309,8 +316,11 @@ public class DISCOWrapper {
 		sb.append(JarExec.runJar(DISCO_JAR_PATH, DEFAULT_WORKING_DIR, new String[] { wordSpacePath, "-f", word1 },
 				JVM_MEMORY_DISCO_MB, false));
 		
-		// run DISCO -s2
-		sb.append("\n\nSemantische Ähnlichkeit erster Ordnung (Cosinus-Distanz) von \""
+		//stop here if word2 is null
+		if (word2 == null) return sb.toString();
+		
+		// run DISCO -s
+		sb.append("\n\nSemantische Ähnlichkeit erster Ordnung von \""
 		+ word1 + "\" und \"" + word2 + "\":\n");
 		sb.append(
 		JarExec.runJar(DISCO_JAR_PATH, DEFAULT_WORKING_DIR,
@@ -318,12 +328,12 @@ public class DISCOWrapper {
 		JVM_MEMORY_DISCO_MB, false));
 		
 		// run DISCO -s2
-		sb.append("\n\nSemantische Ähnlichkeit zweiter Ordnung von \""
-		+ word1 + "\" und \"" + word2 + "\":\n");
-		sb.append(
-		JarExec.runJar(DISCO_JAR_PATH, DEFAULT_WORKING_DIR,
-		new String[] { wordSpacePath, "-s2", word1, word2},
-		JVM_MEMORY_DISCO_MB, false));
+//		sb.append("\n\nSemantische Ähnlichkeit zweiter Ordnung von \""
+//		+ word1 + "\" und \"" + word2 + "\":\n");
+//		sb.append(
+//		JarExec.runJar(DISCO_JAR_PATH, DEFAULT_WORKING_DIR,
+//		new String[] { wordSpacePath, "-s2", word1, word2},
+//		JVM_MEMORY_DISCO_MB, false));
 		
 		// run DISCO -cc
 		sb.append("\n\nGemeinsamer Kontext von \""
@@ -385,7 +395,10 @@ public class DISCOWrapper {
 				line = "numberFeatureWords=" + numberFeatureWords;
 			} else if (line.startsWith("stopwordFile=")) {
 				line = "stopwordFile=" + new File(STOPWORD_PATH).getAbsolutePath();
+			} else if (line.startsWith("dontCompute2ndOrder=")) {
+				line = "dontCompute2ndOrder=true";
 			}
+			
 			sb.append(line);
 			sb.append("\n");
 		}
@@ -403,10 +416,11 @@ public class DISCOWrapper {
 	 * run id for file names and temporary directory names
 	 */
 	private String buildRunID() {
-		return word1 + (word2 != null ? "_" + word2 : "")
+		return word1.replaceAll("\\W", "")
+				+ (word2 != null ? "_" + word2.replaceAll("\\W", "") : "")
 				//+ (dbQuery == null ? "" : "_Q-" + dbQuery)
 				+ (source == null ? "" : "_" + source)
-				+ (yearFrom + yearTo == -2 ? "" : "_[" + yearFrom + "-" + yearTo + "]") + "_" + contextWordsLeftRight
+				+ (yearFrom + yearTo == -2 ? "" : "_" + yearFrom + "-" + yearTo + "") + "_" + contextWordsLeftRight
 				+ "_" + numberFeatureWords + (substrings ? "_subs" : "");
 	}
 	
@@ -426,7 +440,7 @@ public class DISCOWrapper {
 		if (!text.equals(out)){
 			String[] comps = AngStringUtils.findIn("\\p{L}*" + query + "\\p{L}*", text);
 			if (comps.length > 0 && !comps[0].equals(query))
-				addToCountMap(composita, comps[0]);
+				addToCountMap(compounds, comps[0]);
 		}
 		return out;
 	}
@@ -469,9 +483,9 @@ public class DISCOWrapper {
 	 */
 	private String removeTokens(Set<String> tokens, String from){
 		for (String t : tokens){
-			from = from.replaceAll("\\b" + Pattern.quote(t) + "\\b", "");
+			from = from.replaceAll("\\b" + t + "\\b", "");
 		}
-		return from.replaceAll("\\P{L}+", " ");
+		return from.replaceAll("\\P{L}+", " ").trim();
 	}
 	
 	

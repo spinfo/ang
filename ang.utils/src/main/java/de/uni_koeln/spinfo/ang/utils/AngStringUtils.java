@@ -69,7 +69,7 @@ public class AngStringUtils {
 				if (tokens[i].contains(around)) {
 					ind = i;
 					min = Math.max(ind - contextNrOfWords, 0);
-					max = Math.min(ind + contextNrOfWords, tokens.length);
+					max = Math.min(ind + contextNrOfWords + 1, tokens.length);
 					
 					StringBuilder sb = new StringBuilder();
 					for (int j = min; j < max; j++) {
