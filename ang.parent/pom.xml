@@ -15,6 +15,7 @@
 		<module>../ang.generator</module>
 		<module>../ang.lucene</module>
 		<module>../ang.suite</module>
+		<module>../ang.analyzer</module>
 	</modules>
 
 	<dependencies>
