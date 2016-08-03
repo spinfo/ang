@@ -64,7 +64,7 @@ public class MongoWrapper {
 	
 	public FindIterable<Document> getSearchResults(
 			String query,
-			String source,
+			List<String> sources,
 			boolean casesens,
 			boolean regex,
 			boolean useyear,
@@ -91,9 +91,14 @@ public class MongoWrapper {
 			q.put("$text", search);
 		}
 		
-		//source
-		if (source != null && source.length() > 0)
-			q.put("source", source);
+		//sources
+		if (sources != null && sources.size() > 0){
+			if (sources.size() == 1){
+				q.put("source", sources.get(0));
+			} else {
+				q.put("source", new BasicDBObject("$in", sources.toArray()));
+			}
+		}
 		
 		//year
 		if (useyear){
@@ -124,7 +129,7 @@ public class MongoWrapper {
 	 */
 	public FindIterable<Document> getSearchResults(
 			String query,
-			String source,
+			List<String> sources,
 			int yearfrom,
 			int yearto,
 			boolean casesens){
@@ -142,10 +147,16 @@ public class MongoWrapper {
 			q.put("$text", search);
 		}
 		
-		//source
-		if (source != null && source.length() > 0)
-			q.put("source", source);
-		
+		//sources
+		if (sources != null && sources.size() > 0){
+			if (sources.size() == 1){
+				q.put("source", sources.get(0));
+			} else {
+				q.put("source", new BasicDBObject("$in", sources.toArray()));
+			}
+		}
+			
+			
 		//year
 		if (yearfrom >= 0 && yearto >= 0){
 			BasicDBObject year = new BasicDBObject();
