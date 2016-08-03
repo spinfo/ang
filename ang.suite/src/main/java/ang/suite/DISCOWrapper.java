@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -17,7 +18,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.bson.Document;
 
@@ -28,7 +28,6 @@ import de.uni_koeln.spinfo.ang.utils.IO;
 import de.uni_koeln.spinfo.ang.utils.JarExec;
 import de.uni_koeln.spinfo.ang.utils.MongoWrapper;
 import de.uni_koeln.spinfo.ang.utils.ProgressFeedback;
-
 
 
 public class DISCOWrapper {
@@ -111,25 +110,25 @@ public class DISCOWrapper {
 		System.out.println("Building corpus...");
 		corpusPath = buildCorpus();
 
-		if (IO.folderSize(new File(corpusPath).toPath()) <= MAX_CORPUS_SIZE_FOR_ANALYSIS) {
-			// build word-space with DISCOBuilder
-			System.out.println("Building word-space...");
-			wordSpacePath = buildWordSpace(corpusPath);
-		} else {
-			System.out.println("[WARNING] corpus size exceeds maximum for vector analysis!");
-		}
+//		if (IO.folderSize(new File(corpusPath).toPath()) <= MAX_CORPUS_SIZE_FOR_ANALYSIS) {
+//			// build word-space with DISCOBuilder
+//			System.out.println("Building word-space...");
+//			wordSpacePath = buildWordSpace(corpusPath);
+//		} else {
+//			System.out.println("[WARNING] corpus size exceeds maximum for vector analysis!");
+//		}
 
 		System.out.println("Running naive analysis...");
 		// run naive analysis
 		String analysisResults = runNaiveAnalysis(corpusPath);
 
-		if (wordSpacePath != null && new File(wordSpacePath).exists()) {
-			System.out.println("Running DISCO analysis...");
-			// run vector analysis via DISCO
-			analysisResults += runVectorAnalysis(wordSpacePath);
-		} else {
-			System.out.println("Skipping DISCO analysis - wordspace could not be created!");
-		}
+//		if (wordSpacePath != null && new File(wordSpacePath).exists()) {
+//			System.out.println("Running DISCO analysis...");
+//			// run vector analysis via DISCO
+//			analysisResults += runVectorAnalysis(wordSpacePath);
+//		} else {
+//			System.out.println("Skipping DISCO analysis - wordspace could not be created!");
+//		}
 
 		System.out.println("done.\n");
 		if (this.mongo != null)
@@ -137,11 +136,11 @@ public class DISCOWrapper {
 		this.mongo = null;
 
 		// delete wordspace and corpus
-		File wordSpace = null;
-		if (wordSpacePath != null)
-			wordSpace = new File(wordSpacePath);
-		if (!keepWordSpace && wordSpace != null && wordSpace.exists())
-			IO.deleteFolder(wordSpace.getParentFile());
+//		File wordSpace = null;
+//		if (wordSpacePath != null)
+//			wordSpace = new File(wordSpacePath);
+//		if (!keepWordSpace && wordSpace != null && wordSpace.exists())
+//			IO.deleteFolder(wordSpace.getParentFile());
 		IO.deleteFolder(new File(corpusPath));
 
 		// write results to file
@@ -179,13 +178,15 @@ public class DISCOWrapper {
 		System.out.print("[INFO] generating corpus for \"" + word + "\"... ");
 		// query db for data
 		FindIterable<Document> results;
+		List<String> sources = new ArrayList<String>();
+		sources.add(source);
 		if (substrings){
 			results = mongo.getSearchResults(
-					parseRegexQuery(word), source, false, true,
+					parseRegexQuery(word), sources, false, true,
 					(yearFrom > -1 && yearTo > -1), yearFrom, yearTo, 25000);
 		} else {
 			results = mongo.getSearchResults(
-					word, source, yearFrom, yearTo, false);
+					word, sources, yearFrom, yearTo, false);
 		}
 		
 		//create temporary corpus
