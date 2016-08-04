@@ -44,10 +44,17 @@ public class Main {
 		
 		//create analysis profile
 		AnalysisProfile profile = new AnalysisProfile();
-		profile.setTerms(params.get("terms").split("\\,"));
-		profile.setSources(params.get("sources").split("\\,"));
-		profile.setYearFrom(Integer.parseInt(params.get("from")));
-		profile.setYearTo(Integer.parseInt(params.get("to")));
+		if (params.get("terms") != null)
+			profile.setTerms(params.get("terms").split("\\,"));
+		else
+			argsError();
+		
+		if (params.get("sources") != null)
+			profile.setSources(params.get("sources").split("\\,"));
+		if (params.get("from") != null)
+			profile.setYearFrom(Integer.parseInt(params.get("from")));
+		if (params.get("to") != null)
+			profile.setYearTo(Integer.parseInt(params.get("to")));
 		if (params.get("stopwords") != null)
 			profile.setUseStopwords(Boolean.parseBoolean(params.get("stopwords")));
 		if (params.get("compounds") != null)
