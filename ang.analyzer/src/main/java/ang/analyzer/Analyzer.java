@@ -114,7 +114,7 @@ public class Analyzer {
 			profile.addCorpusFile(corpusFile);
 		}
 
-		System.out.println("[INFO]\tcorpora complete. reused form cache: "
+		System.out.println("[INFO]\tcorpora complete. reused from cache: "
 				+ countCache + " - generated: " + countFresh);
 	}
 	
@@ -156,13 +156,13 @@ public class Analyzer {
 		}
 		
 		//sort and add compounds map to profile
-		compounds = sortByValue(compounds, false);
+		compounds = sortMapByValue(compounds, false);
 		profile.addCompounds(term, compounds);
 		
 		//increase term count in profile
 		profile.increaseTermCount(term, occCount);
 
-		System.out.println("[INFO]\tterm '" + term + "' found " + occCount + " times.");
+		System.out.println("found " + occCount + " times.");
 		return sb.toString();
 	}
 	
@@ -200,7 +200,7 @@ public class Analyzer {
 		}
 		
 		//sort co-occurrence map
-		coOccurrences = sortByValue(coOccurrences, false);
+		coOccurrences = sortMapByValue(coOccurrences, false);
 		
 		// delete all but 30 most frequent
 		int count = 0;
@@ -240,22 +240,26 @@ public class Analyzer {
 				+ OUTPUT_SECTION_SEPARATOR + "\n");
 		
 		for (String t1 : profile.getTermsSet()){
+			Map<String, Float> sim = new HashMap<String, Float>();
+			sb.append(t1 + ":\n");
 			for (String t2 : profile.getTermsSet()){
-				sb.append(t1 + ", " + t2 + "\t");
-				
-				Map<String, Integer> coo1 = profile.getCoOccurrences(t1);
-				Map<String, Integer> coo2 = profile.getCoOccurrences(t2);
+				Map<String, Integer> coOcc1 = profile.getCoOccurrences(t1);
+				Map<String, Integer> coOcc2 = profile.getCoOccurrences(t2);
 				float countCoOcc = 0;
-				for (Entry<String, Integer> e : coo1.entrySet()){
-					if (coo2.get(e.getKey()) != null){
+				for (Entry<String, Integer> e : coOcc1.entrySet()){
+					if (coOcc2.get(e.getKey()) != null){
 						countCoOcc++;
 					}
 				}
-				sb.append((countCoOcc/(float)coo1.size()) + "\n");
+				sim.put(t2, (countCoOcc/(float)coOcc1.size()));
 			}
+			sim = sortMapByValue(sim, false);
+			for (Entry<String, Float> e : sim.entrySet()){
+				sb.append(" - " + e.getKey() + ": " + e.getValue() + "\n");
+			}
+			sb.append("\n");
 		}
 		
-		sb.append(OUTPUT_SECTION_SEPARATOR + "\n");
 		return sb.toString();
 	}
 	
@@ -283,7 +287,7 @@ public class Analyzer {
 	/*
 	 * sort a map by value
 	 */
-	private <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map, final boolean ascending) {
+	private <K, V extends Comparable<? super V>> Map<K, V> sortMapByValue(Map<K, V> map, final boolean ascending) {
 		List<Map.Entry<K, V>> list = new LinkedList<>(map.entrySet());
 		Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
 			@Override
@@ -305,7 +309,7 @@ public class Analyzer {
 	/*
 	 * add to Map<String, Integer>, only keep and count unique entries
 	 */
-	public static void addToCountMap(Map<String, Integer> map, String s){
+	private void addToCountMap(Map<String, Integer> map, String s){
 		if (map.containsKey(s)) {
 			map.put(s, map.get(s) + 1);
 		} else {
@@ -325,8 +329,7 @@ public class Analyzer {
 	
 	private String buildResultsHeader(AnalysisProfile profile){
 		StringBuilder sb = new StringBuilder();
-		sb.append(OUTPUT_SECTION_SEPARATOR);
-		sb.append("\nAnalyse-Parameter:\nTerme: ");
+		sb.append("Analyse-Parameter:\n" + OUTPUT_SECTION_SEPARATOR + "\n" + "Terme: ");
 		for (String t : profile.getTermsSet()) sb.append(t + " ");
 		sb.append("\nQuellen: ");
 		for (String s : profile.getSources()) sb.append(s + " ");
@@ -335,7 +338,7 @@ public class Analyzer {
 		sb.append("\nJahr bis: " + (profile.getYearTo() == -1 ? "alle" : profile.getYearTo()));
 		sb.append("\nWortkontext: " + profile.getContextSize() + " Wörter");
 		sb.append("\nStopwörter: " + (profile.usesStopwords() ? "ja" : "nein"));
-		return sb.toString() + "\n" + OUTPUT_SECTION_SEPARATOR + "\n";
+		return sb.toString() + "\n";
 	}
 
 }
