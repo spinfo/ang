@@ -77,6 +77,7 @@ public class AnalysisProfile {
 		if (useCompounds) sb.append("_COMP");
 		if (useStopwords) sb.append("_STOP");
 		sb.append("_CNT" + contextSize);
+		sb.append("_" + System.currentTimeMillis());
 		this.id = sb.toString();
 	}
 	

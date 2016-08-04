@@ -200,14 +200,18 @@ public class Analyzer {
 		coOccurrences = sortByValue(coOccurrences, false);
 		
 		// delete all but 20 most frequent
+		Map<String, Integer> toRemove = new HashMap<String, Integer>();
 		int count = 0;
 		for (Entry<String, Integer> e : coOccurrences.entrySet()) {
 			if (count <= 20) {
 				sb.append(e.getKey() + "\t" + ((double) e.getValue() / (double) occCount) + "\n");
 				count++;
 			} else {
-				coOccurrences.remove(e.getKey());
+				toRemove.put(e.getKey(),e.getValue());
 			}
+		}
+		for (Entry<String, Integer> e : toRemove.entrySet()) {
+			coOccurrences.remove(e.getKey());
 		}
 		
 		//add co-occurrences to profile
