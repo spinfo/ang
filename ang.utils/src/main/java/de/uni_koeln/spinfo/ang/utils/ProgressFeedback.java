@@ -18,11 +18,11 @@ public class ProgressFeedback {
 		System.out.print("\r[ " + processName + " ]\t" + String.format("%.2f", (step / steps) * 100D) + " %");
 
 		if (steps == step)
-			System.out.print("\r\t\t\t\t\t\t\t\n");
+			System.out.print("\r\t\t\t\t\t\t\t");
 	}
 
 	public void end() {
-		System.out.print("\r\t\t\t\t\t\t\t\n");
+		System.out.print("\r\t\t\t\t\t\t\t");
 	}
 
 }
