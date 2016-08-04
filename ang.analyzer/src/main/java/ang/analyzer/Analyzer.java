@@ -102,7 +102,6 @@ public class Analyzer {
 			if ((corpusFile = checkForExistingCorpusFile(profile.getCorpusFileIDFor(t))) != null){
 				System.out.println(" found corpus file in cache: " + corpusFile.getName());
 				countCache++;
-				continue;
 			} else {
 				corpusFile = new File(CACHE_DIR + SEP + profile.getCorpusFileIDFor(t) + ".txt");
 				IO.writeStringToFile(buildCorpus(t, profile), corpusFile.getAbsolutePath());
@@ -169,8 +168,7 @@ public class Analyzer {
 
 	private String runNaiveAnalysis(AnalysisProfile profile, String term) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("\n\nKookkurenzen von " + term + "\n"
-				+ OUTPUT_SECTION_SEPARATOR + "\n");
+		sb.append("\n\n" + OUTPUT_SECTION_SEPARATOR + "\nKookkurenzen von " + term + "\n\n");
 
 		// create co-occurrences map
 		Map<String, Integer> coOccurrences = new HashMap<String, Integer>();
@@ -228,7 +226,7 @@ public class Analyzer {
 		
 		//term occurences
 		sb.append("\nKorpushäufigkeit von " + term + ": " + occCount
-				+ OUTPUT_SECTION_SEPARATOR + "\n");
+				+ "\n" + OUTPUT_SECTION_SEPARATOR + "\n");
 
 		return sb.toString();
 	}
