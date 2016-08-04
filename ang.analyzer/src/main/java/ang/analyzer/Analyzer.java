@@ -100,7 +100,7 @@ public class Analyzer {
 			File corpusFile;
 			//check cache directory for existing corpus file
 			if ((corpusFile = checkForExistingCorpusFile(profile.getCorpusFileIDFor(t))) != null){
-				System.out.println("[INFO]\tfound corpus file in cache: " + corpusFile.getName());
+				System.out.println(" found corpus file in cache: " + corpusFile.getName());
 				countCache++;
 				continue;
 			} else {
@@ -112,7 +112,7 @@ public class Analyzer {
 		}
 
 		System.out.println("[INFO] corpora complete. reused form cache: "
-				+ countCache + ". generated: " + countFresh + ".");
+				+ countCache + " - generated: " + countFresh);
 	}
 	
 	private String buildCorpus(String term, AnalysisProfile profile) throws IOException{

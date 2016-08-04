@@ -40,6 +40,7 @@ public class AnalysisProfile {
 		this.useStopwords = true;
 		this.useOnlyContexts = true;
 		this.results = new StringBuilder();
+		this.corpus = new ArrayList<File>();
 	}
 
 	public AnalysisProfile(
@@ -120,7 +121,9 @@ public class AnalysisProfile {
 		} else {
 			String src = "";
 			for (String s : sources) src += "_" + s;
-			return term.toUpperCase() + src;
+			return term.toUpperCase() + src
+					+ (yearFrom != -1 ? "_" + yearFrom : "")
+					+ (yearTo != -1 ? "_" + yearTo : "");
 		}
 	}
 
