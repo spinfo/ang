@@ -296,7 +296,7 @@ public class Analyzer {
 	private String buildResultsHeader(AnalysisProfile profile){
 		StringBuilder sb = new StringBuilder();
 		sb.append(OUTPUT_SECTION_SEPARATOR);
-		sb.append("Analyse-Parameter:\nTerme: ");
+		sb.append("\nAnalyse-Parameter:\nTerme: ");
 		for (String t : profile.getTerms()) sb.append(t + " ");
 		sb.append("\nQuellen: ");
 		for (String s : profile.getSources()) sb.append(s + " ");
@@ -305,7 +305,7 @@ public class Analyzer {
 		sb.append("\nJahr bis: " + (profile.getYearTo() == -1 ? "alle" : profile.getYearTo()));
 		sb.append("\nWortkontext: " + profile.getContextSize() + " Wörter");
 		sb.append("\nStopwörter: " + (profile.usesStopwords() ? "ja" : "nein"));
-		return sb.toString() + OUTPUT_SECTION_SEPARATOR + "\n";
+		return sb.toString() + "\n" + OUTPUT_SECTION_SEPARATOR + "\n";
 	}
 
 }

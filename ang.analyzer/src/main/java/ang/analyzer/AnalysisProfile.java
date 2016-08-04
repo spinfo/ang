@@ -39,6 +39,7 @@ public class AnalysisProfile {
 		this.useCompounds = false;
 		this.useStopwords = true;
 		this.useOnlyContexts = true;
+		this.results = new StringBuilder();
 	}
 
 	public AnalysisProfile(
@@ -105,8 +106,8 @@ public class AnalysisProfile {
 		stopWords.add(stopWord);
 	}
 	
-	public void addStopWords(Collection<String> stopWords){
-		stopWords.addAll(stopWords);
+	public void addStopWords(List<String> stopWords){
+		for (String s : stopWords) this.stopWords.add(s);
 	}
 	
 	public Set<String> getStopWords(){
