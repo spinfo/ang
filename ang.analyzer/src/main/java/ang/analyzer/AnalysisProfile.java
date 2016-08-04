@@ -64,19 +64,18 @@ public class AnalysisProfile {
 	
 	private void generateID(){
 		StringBuilder sb = new StringBuilder();
-		sb.append("TRM");
 		for (String t : terms)
-			sb.append("-" + t.replaceAll("\\W", "")
-					.substring(0, Math.min(3, t.length())));
-		sb.append("_SRC");
+			sb.append(t.replaceAll("\\W", "")
+					.substring(0, Math.min(4, t.length())) + "-");
 		for (String s : sources)
-			sb.append("-" + s.replaceAll("\\W", "")
-					.substring(0, Math.min(3, s.length())));
+			sb.append(s.replaceAll("\\W", "")
+					.substring(0, Math.min(4, s.length())) + "-");
+		sb.deleteCharAt(sb.length()-1);
 		if (yearFrom > -1) sb.append("_" + yearFrom);
 		if (yearTo > -1) sb.append("_" + yearTo);
 		if (useCompounds) sb.append("_COMP");
 		if (useStopwords) sb.append("_STOP");
-		sb.append("_CNT-" + contextSize);
+		sb.append("_CNT" + contextSize);
 		this.id = sb.toString();
 	}
 	
