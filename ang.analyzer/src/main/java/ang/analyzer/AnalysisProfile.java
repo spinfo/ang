@@ -2,7 +2,6 @@ package ang.analyzer;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -12,7 +11,7 @@ import java.util.Set;
 public class AnalysisProfile {
 
 	private String id;
-	private List<String> terms;
+	private Map<String, Integer> terms;
 	private List<String> sources;
 	private Set<String> stopWords;
 	private Map<String, Map<String, Integer>> coOccurences;
@@ -30,7 +29,7 @@ public class AnalysisProfile {
 	
 	public AnalysisProfile(){
 		super();
-		this.terms = new ArrayList<String>();
+		this.terms = new HashMap<String, Integer>();
 		this.sources = new ArrayList<String>();
 		this.stopWords = new HashSet<String>();
 		this.yearFrom = -1;
@@ -65,7 +64,7 @@ public class AnalysisProfile {
 	
 	private void generateID(){
 		StringBuilder sb = new StringBuilder();
-		for (String t : terms)
+		for (String t : terms.keySet())
 			sb.append(t.replaceAll("\\W", "")
 					.substring(0, Math.min(4, t.length())) + "-");
 		for (String s : sources)
@@ -116,7 +115,7 @@ public class AnalysisProfile {
 	}
 	
 	public String getCorpusFileIDFor(String term){
-		if (!terms.contains(term.toUpperCase())){
+		if (terms.get(term.toUpperCase()) == null){
 			System.err.println("[ERROR]\tterm \"" + term + "\" not in profiles terms list!");
 			return null;
 		} else {
@@ -124,19 +123,28 @@ public class AnalysisProfile {
 			for (String s : sources) src += "_" + s;
 			return term.toUpperCase() + src
 					+ (yearFrom != -1 ? "_" + yearFrom : "")
-					+ (yearTo != -1 ? "_" + yearTo : "");
+					+ (yearTo != -1 ? "_" + yearTo : "")
+					+ "_" + contextSize;
 		}
 	}
 
-	public List<String> getTerms() {
+	public Map<String, Integer> getTermsMap() {
 		return terms;
+	}
+	
+	public Set<String> getTermsSet() {
+		return terms.keySet();
 	}
 
 	public void setTerms(String[] terms) {
 		this.terms.clear();
 		if (terms == null) return;
 		for (int i = 0; i < terms.length; i++)
-			this.terms.add(terms[i].toUpperCase());
+			this.terms.put(terms[i].toUpperCase(), 0);
+	}
+	
+	public void increaseTermCount(String term, int amount){
+		terms.put(term, terms.get(term) + amount);
 	}
 
 	public List<String> getSources() {

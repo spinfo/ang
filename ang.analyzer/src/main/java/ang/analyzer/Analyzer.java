@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+
 import org.bson.Document;
 
 import com.mongodb.client.FindIterable;
@@ -20,7 +22,6 @@ import com.mongodb.client.FindIterable;
 import de.uni_koeln.spinfo.ang.utils.AngStringUtils;
 import de.uni_koeln.spinfo.ang.utils.IO;
 import de.uni_koeln.spinfo.ang.utils.MongoWrapper;
-import de.uni_koeln.spinfo.ang.utils.ProgressFeedback;
 
 
 public class Analyzer {
@@ -63,11 +64,14 @@ public class Analyzer {
 		
 		// run analysis
 		System.out.println("[INFO]\tRunning analysis...");
-		for (String t : profile.getTerms())
-			profile.addToResults(runNaiveAnalysis(profile, t));
+		for (String t : profile.getTermsSet())
+			profile.addToResults(runCoOccurrenceAnalysis(profile, t));
+		
+		// calculate semantic similarity (first order)
+		profile.addToResults(calculateSimilarity(profile));
 		
 		//cleanup
-		System.out.println("[INFO]\tdone.\n");
+		System.out.println("\n[INFO]\tdone.\n");
 		if (this.mongo != null)
 			this.mongo.close();
 		this.mongo = null;
@@ -82,7 +86,7 @@ public class Analyzer {
 	private void buildCorpus(AnalysisProfile profile) throws IOException {
 		// prepare stopwords
 		if (profile.usesStopwords()){
-			System.out.print("[INFO] building stopword list... ");
+			System.out.print("[INFO]\tbuilding stopword list... ");
 			profile.addStopWords(Arrays.asList(IO.readFile(STOPWORDS_PATH)
 					.toUpperCase().split("\\P{L}+")));
 			System.out.println("(" + profile.getStopWords().size() + " words)");
@@ -95,8 +99,8 @@ public class Analyzer {
 		//build corpus
 		int countCache = 0;
 		int countFresh = 0;
-		for (String t : profile.getTerms()){
-			System.out.print("[INFO] generating corpus for \"" + t + "\"... ");
+		for (String t : profile.getTermsSet()){
+			System.out.print("[INFO]\tgenerating corpus for \"" + t + "\"... ");
 			File corpusFile;
 			//check cache directory for existing corpus file
 			if ((corpusFile = checkForExistingCorpusFile(profile.getCorpusFileIDFor(t))) != null){
@@ -110,7 +114,7 @@ public class Analyzer {
 			profile.addCorpusFile(corpusFile);
 		}
 
-		System.out.println("[INFO] corpora complete. reused form cache: "
+		System.out.println("[INFO]\tcorpora complete. reused form cache: "
 				+ countCache + " - generated: " + countFresh);
 	}
 	
@@ -154,6 +158,9 @@ public class Analyzer {
 		//sort and add compounds map to profile
 		compounds = sortByValue(compounds, false);
 		profile.addCompounds(term, compounds);
+		
+		//increase term count in profile
+		profile.increaseTermCount(term, occCount);
 
 		System.out.println("[INFO]\tterm '" + term + "' found " + occCount + " times.");
 		return sb.toString();
@@ -166,15 +173,15 @@ public class Analyzer {
 		return null;
 	}
 
-	private String runNaiveAnalysis(AnalysisProfile profile, String term) {
+	private String runCoOccurrenceAnalysis(AnalysisProfile profile, String term) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("\n\n" + OUTPUT_SECTION_SEPARATOR + "\nKookkurenzen von " + term + "\n\n");
+		sb.append("\n\nKookkurenzen von " + term + ":\n"
+				+ OUTPUT_SECTION_SEPARATOR + "\n");
 
 		// create co-occurrences map
 		Map<String, Integer> coOccurrences = new HashMap<String, Integer>();
 
 		// analyze
-		ProgressFeedback pf = new ProgressFeedback("Naive Analysis", profile.getCorpusFiles().size());
 		int occCount = 0;
 		for (File f : profile.getCorpusFiles()) {
 			String content = IO.readFile(f.getAbsolutePath());
@@ -190,26 +197,21 @@ public class Analyzer {
 					addToCountMap(coOccurrences, token);
 				}
 			}
-			pf.step();
 		}
-		pf.end();
 		
 		//sort co-occurrence map
 		coOccurrences = sortByValue(coOccurrences, false);
 		
-		// delete all but 20 most frequent
-		Map<String, Integer> toRemove = new HashMap<String, Integer>();
+		// delete all but 30 most frequent
 		int count = 0;
-		for (Entry<String, Integer> e : coOccurrences.entrySet()) {
-			if (count <= 20) {
+		for (Iterator<Map.Entry<String, Integer>> it = coOccurrences.entrySet().iterator(); it.hasNext(); ) {
+			Map.Entry<String, Integer> e = it.next();
+			if (count <= 30) {
 				sb.append(e.getKey() + "\t" + ((double) e.getValue() / (double) occCount) + "\n");
 				count++;
 			} else {
-				toRemove.put(e.getKey(),e.getValue());
+				it.remove();
 			}
-		}
-		for (Entry<String, Integer> e : toRemove.entrySet()) {
-			coOccurrences.remove(e.getKey());
 		}
 		
 		//add co-occurrences to profile
@@ -225,12 +227,38 @@ public class Analyzer {
 		}
 		
 		//term occurences
-		sb.append("\nKorpushäufigkeit von " + term + ": " + occCount
-				+ "\n" + OUTPUT_SECTION_SEPARATOR + "\n");
+		sb.append("\nKorpushäufigkeit von " + term + ": " + occCount + "\n\n");
 
 		return sb.toString();
 	}
-
+	
+	private String calculateSimilarity(AnalysisProfile profile){
+		//TODO hierfür sollte man lieber eine bewährte
+		//methode wählen, diese hier ist improvisiert!
+		StringBuilder sb = new StringBuilder();
+		sb.append("\n\nSemantische Ähnlichkeit nach Kookkurenzen:\n"
+				+ OUTPUT_SECTION_SEPARATOR + "\n");
+		
+		for (String t1 : profile.getTermsSet()){
+			for (String t2 : profile.getTermsSet()){
+				sb.append(t1 + ", " + t2 + "\t");
+				
+				Map<String, Integer> coo1 = profile.getCoOccurrences(t1);
+				Map<String, Integer> coo2 = profile.getCoOccurrences(t2);
+				float countCoOcc = 0;
+				for (Entry<String, Integer> e : coo1.entrySet()){
+					if (coo2.get(e.getKey()) != null){
+						countCoOcc++;
+					}
+				}
+				sb.append((countCoOcc/(float)coo1.size()) + "\n");
+			}
+		}
+		
+		sb.append(OUTPUT_SECTION_SEPARATOR + "\n");
+		return sb.toString();
+	}
+	
 	/*
 	 * construct simple regex query
 	 */
@@ -277,7 +305,7 @@ public class Analyzer {
 	/*
 	 * add to Map<String, Integer>, only keep and count unique entries
 	 */
-	private void addToCountMap(Map<String, Integer> map, String s){
+	public static void addToCountMap(Map<String, Integer> map, String s){
 		if (map.containsKey(s)) {
 			map.put(s, map.get(s) + 1);
 		} else {
@@ -299,7 +327,7 @@ public class Analyzer {
 		StringBuilder sb = new StringBuilder();
 		sb.append(OUTPUT_SECTION_SEPARATOR);
 		sb.append("\nAnalyse-Parameter:\nTerme: ");
-		for (String t : profile.getTerms()) sb.append(t + " ");
+		for (String t : profile.getTermsSet()) sb.append(t + " ");
 		sb.append("\nQuellen: ");
 		for (String s : profile.getSources()) sb.append(s + " ");
 		sb.append("\nWort auch in Komposita suchen: " + (profile.usesCompounds() ? "Ja" : "Nein"));

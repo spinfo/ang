@@ -23,7 +23,7 @@ public class Main {
 				System.out.println("\n******************\n"
 						+ "STARTING BATCH RUN\n"
 						+ cmd + "\n"
-						+ "******************\n\n");
+						+ "******************\n");
 				//call program with current command
 				run(cmd.split(" "));
 			}
