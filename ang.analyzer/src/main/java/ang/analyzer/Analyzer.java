@@ -233,8 +233,19 @@ public class Analyzer {
 	}
 	
 	private String calculateSimilarity(AnalysisProfile profile){
-		//TODO hierfür sollte man lieber eine bewährte
-		//methode wählen, diese hier ist improvisiert!
+		//TODO
+		/*
+		 *  hierfür sollte man lieber eine bewährte methode wählen,
+		 *  diese hier ist improvisiert! im moment wird einfach nur
+		 *  für jeden term das ergebnis der rechnung
+		 *  [anzahl der gemeinsamen kookkurenzen] / [anzahl der kookkurenzen]
+		 *  als ähnlichkeitswert angenommen, wobei [anzahl der kookkurenzen]
+		 *  immer 30 ist, weil nur die 30 häufigsten in der map sind.
+		 *  hier kann gerne rumgespielt werden, um das sinnvoller zu gestalten.
+		 *  hinweis: alles, was per sb.append(...) angehängt wird, landet
+		 *  dann auch in der ergebnisdatei.
+		 *  PS: wer braucht groß/-kleinschreibung?!
+		 */
 		StringBuilder sb = new StringBuilder();
 		sb.append("\n\nSemantische Ähnlichkeit nach Kookkurenzen:\n"
 				+ OUTPUT_SECTION_SEPARATOR + "\n");
