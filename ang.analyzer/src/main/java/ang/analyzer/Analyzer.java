@@ -39,7 +39,7 @@ public class Analyzer {
 	private void init() {
 		this.mongo = new MongoWrapper();
 		Properties props = IO.loadProperties("db.properties", this.getClass());
-
+		
 		mongo.init(props.getProperty("user"), // USER
 				props.getProperty("pw"), // PASS
 				props.getProperty("db"), // DB
@@ -183,19 +183,25 @@ public class Analyzer {
 
 		// analyze
 		int occCount = 0;
-		for (File f : profile.getCorpusFiles()) {
-			String content = IO.readFile(f.getAbsolutePath());
-			//occCount += content.split("\n").length;
-			for (String text : content.split("\n")){
-				if (!text.contains(term)) continue;
-				for (String token : text.split("\\P{L}+")) {
-					if (token.length() < 3) continue;
-					if (token.contains(term)){
-						occCount++;
-						continue;
-					}
-					addToCountMap(coOccurrences, token);
+		File f = null;
+		for (File c : profile.getCorpusFiles()){
+			if (c.getName().contains(profile.getCorpusFileIDFor(term))){
+				f = c;
+				break;
+			}
+		}
+		if (f == null) return "ERROR: corpus file for '" + term + "' not found.";
+		String content = IO.readFile(f.getAbsolutePath());
+		//occCount += content.split("\n").length;
+		for (String text : content.split("\n")){
+			if (!text.contains(term)) continue;
+			for (String token : text.split("\\P{L}+")) {
+				if (token.length() < 3) continue;
+				if (token.contains(term)){
+					occCount++;
+					continue;
 				}
+				addToCountMap(coOccurrences, token);
 			}
 		}
 		
@@ -204,11 +210,13 @@ public class Analyzer {
 		
 		// delete all but 30 most frequent
 		int count = 0;
+		double maxVal = -1;
 		for (Iterator<Map.Entry<String, Integer>> it = coOccurrences.entrySet().iterator(); it.hasNext(); ) {
 			Map.Entry<String, Integer> e = it.next();
 			if (count <= 30) {
 				double val = ((double) e.getValue() / (double) occCount);
-				sb.append(barGraph(val, 1, 20) + "\t");
+				if (maxVal == -1) maxVal = val;
+				sb.append(barGraph(val, maxVal, 20) + "\t");
 				sb.append(e.getKey() + "\t" + val + "\n");
 				count++;
 			} else {
@@ -358,7 +366,7 @@ public class Analyzer {
 		if (max == 0) return "ERROR: bar graph max value cannot be 0";
 		StringBuilder sb = new StringBuilder();
 		int val = Math.round(length * ((float)value / (float)max));
-		for (int i = 0; i < length; i++) sb.append(val <= i ? "|" : ".");
+		for (int i = 0; i < length; i++) sb.append(val >= i ? "|" : " ");
 		return sb.toString();
 	}
 
