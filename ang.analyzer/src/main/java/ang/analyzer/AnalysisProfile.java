@@ -66,10 +66,10 @@ public class AnalysisProfile {
 		StringBuilder sb = new StringBuilder();
 		for (String t : terms.keySet())
 			sb.append(t.replaceAll("\\W", "")
-					.substring(0, Math.min(4, t.length())) + "-");
+					.substring(0, Math.min(4, t.replaceAll("\\W", "").length())) + "-");
 		for (String s : sources)
 			sb.append(s.replaceAll("\\W", "")
-					.substring(0, Math.min(4, s.length())) + "-");
+					.substring(0, Math.min(4, s.replaceAll("\\W", "").length())) + "-");
 		sb.deleteCharAt(sb.length()-1);
 		if (yearFrom > -1) sb.append("_" + yearFrom);
 		if (yearTo > -1) sb.append("_" + yearTo);
