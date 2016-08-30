@@ -124,6 +124,7 @@ public class AnalysisProfile {
 			return term.toUpperCase() + src
 					+ (yearFrom != -1 ? "_" + yearFrom : "")
 					+ (yearTo != -1 ? "_" + yearTo : "")
+					+ (useCompounds ? "" : "_NOCOMP")
 					+ "_" + contextSize;
 		}
 	}
