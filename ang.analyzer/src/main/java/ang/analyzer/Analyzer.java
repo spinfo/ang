@@ -207,7 +207,9 @@ public class Analyzer {
 		for (Iterator<Map.Entry<String, Integer>> it = coOccurrences.entrySet().iterator(); it.hasNext(); ) {
 			Map.Entry<String, Integer> e = it.next();
 			if (count <= 30) {
-				sb.append(e.getKey() + "\t" + ((double) e.getValue() / (double) occCount) + "\n");
+				double val = ((double) e.getValue() / (double) occCount);
+				sb.append(barGraph(val, 1, 20) + "\t");
+				sb.append(e.getKey() + "\t" + val + "\n");
 				count++;
 			} else {
 				it.remove();
@@ -350,6 +352,14 @@ public class Analyzer {
 		sb.append("\nWortkontext: " + profile.getContextSize() + " Wörter");
 		sb.append("\nStopwörter: " + (profile.usesStopwords() ? "ja" : "nein"));
 		return sb.toString() + "\n";
+	}
+	
+	private String barGraph(double value, double max, int length){
+		if (max == 0) return "ERROR: bar graph max value cannot be 0";
+		StringBuilder sb = new StringBuilder();
+		int val = Math.round(length * ((float)value / (float)max));
+		for (int i = 0; i < length; i++) sb.append(val <= i ? "|" : ".");
+		return sb.toString();
 	}
 
 }
