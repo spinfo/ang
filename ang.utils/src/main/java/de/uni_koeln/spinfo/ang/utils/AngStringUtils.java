@@ -56,6 +56,11 @@ public class AngStringUtils {
 	
 	
 	public static List<String> trimTextMulti(String text, String around, int contextNrOfWords) {
+		return trimTextMulti(text, around, contextNrOfWords, true);
+	}
+	
+	
+	public static List<String> trimTextMulti(String text, String around, int contextNrOfWords, boolean useSubstrings) {
 		List<String> out = new ArrayList<String>();
 		
 		String[] tokens = text.split(" ");
@@ -66,18 +71,18 @@ public class AngStringUtils {
 
 		while (count > 0){
 			for (int i = ind+1; i < tokens.length; i++) {
-				if (tokens[i].contains(around)) {
-					ind = i;
-					min = Math.max(ind - contextNrOfWords, 0);
-					max = Math.min(ind + contextNrOfWords + 1, tokens.length);
-					
-					StringBuilder sb = new StringBuilder();
-					for (int j = min; j < max; j++) {
-						sb.append(tokens[j]);
-						sb.append(" ");
-					}
-					out.add(sb.toString());
+				if (useSubstrings && !tokens[i].contains(around)) continue;
+				if (!useSubstrings && !tokens[i].equalsIgnoreCase(around)) continue;
+				ind = i;
+				min = Math.max(ind - contextNrOfWords, 0);
+				max = Math.min(ind + contextNrOfWords + 1, tokens.length);
+				
+				StringBuilder sb = new StringBuilder();
+				for (int j = min; j < max; j++) {
+					sb.append(tokens[j]);
+					sb.append(" ");
 				}
+				out.add(sb.toString());
 			}
 			count--;
 		}

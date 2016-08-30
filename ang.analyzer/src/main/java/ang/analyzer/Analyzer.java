@@ -149,7 +149,7 @@ public class Analyzer {
 			
 			//trim text to context windows
 			List<String> texts = AngStringUtils.trimTextMulti(
-					text, term, profile.getContextSize() + 1);
+					text, term, profile.getContextSize() + 1, profile.usesCompounds());
 			
 			for (String t : texts){
 				if (t.length() < 5) continue;
