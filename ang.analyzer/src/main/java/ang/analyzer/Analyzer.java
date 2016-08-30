@@ -130,6 +130,9 @@ public class Analyzer {
 					term, profile.getSources(), profile.getYearFrom(), profile.getYearTo(), false);
 		}
 		
+		//set no timeout
+		results.noCursorTimeout(true);
+		
 		//create compounds map
 		Map<String, Integer> compounds = new HashMap<String, Integer>();
 		
@@ -140,7 +143,7 @@ public class Analyzer {
 			String text = doc.getString("text").toUpperCase();
 			text = text.replaceAll("\\-", " "); //remove hyphens
 			if (!profile.usesCompounds() && !text.matches(".*\\b" + term + "\\b.*")) continue; //ignore if only compounds were found
-			text = seperateQuery(text, term, compounds); //separate composites
+			if (profile.usesCompounds()) text = seperateQuery(text, term, compounds); //separate composites
 			text = text.replaceAll("\\P{L}+", " ").trim();
 			text = removeTokens(profile.getStopWords(), text); //remove stopwords
 			
