@@ -197,7 +197,8 @@ public class Analyzer {
 		String content = IO.readFile(f.getAbsolutePath());
 		//occCount += content.split("\n").length;
 		for (String text : content.split("\n")){
-			if (!text.contains(term)) continue;
+			if (profile.usesCompounds() && !text.contains(term)) continue;
+			if (!profile.usesCompounds() && !text.contains(" " + term + " ")) continue;
 			for (String token : text.split("\\P{L}+")) {
 				if (token.length() < 3) continue;
 				if (token.contains(term)){
