@@ -39,6 +39,7 @@ public class MongoWrapper {
 				+ "/?authSource=" + db + "&authMechanism=SCRAM-SHA-1");
 		if (mongoClient != null) mongoClient.close();
 		mongoClient = new MongoClient(uri);
+		System.out.println("MONGO SOCKET TIMEOUT: " + mongoClient.getMongoClientOptions().getSocketTimeout() + " ms");
 		Logger.getLogger("org.mongodb.driver").setLevel(Level.WARNING);
 		database = mongoClient.getDatabase(db);
 		coll = database.getCollection(collection);
