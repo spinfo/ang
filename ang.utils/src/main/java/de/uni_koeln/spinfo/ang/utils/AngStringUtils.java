@@ -60,6 +60,14 @@ public class AngStringUtils {
 	}
 	
 	
+	public static List<String> trimTextMulti(String text, String[] around, int contextNrOfWords, boolean useSubstrings) {
+		List<String> out = new ArrayList<String>();
+		for (int i = 0; i < around.length; i++) {
+			out.addAll(trimTextMulti(text, around[i], contextNrOfWords, useSubstrings));
+		}
+		return out;
+	}
+	
 	public static List<String> trimTextMulti(String text, String around, int contextNrOfWords, boolean useSubstrings) {
 		List<String> out = new ArrayList<String>();
 		
