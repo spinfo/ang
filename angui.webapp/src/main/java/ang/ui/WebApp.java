@@ -77,10 +77,10 @@ public class WebApp implements spark.servlet.SparkApplication {
 			// defaults
 			source = (source == null ? "" : source);
 			query = (query == null ? "" : query);
-			lengthlimit = (lengthlimit == null ? "200" : lengthlimit);
+			lengthlimit = (lengthlimit == null ? "20" : lengthlimit);
 			yearfrom = (yearfrom == null ? "1516" : yearfrom);
 			yearto = (yearto == null ? "2020" : yearto);
-			maxdistance = (maxdistance == null ? "100" : maxdistance);
+			maxdistance = (maxdistance == null ? "10" : maxdistance);
 			limitresults = (limitresults == null ? "1000" : limitresults);
 
 			// create model
@@ -134,11 +134,12 @@ public class WebApp implements spark.servlet.SparkApplication {
 							continue;
 
 						String[] matches = findMatches(doc.getString("text"), patterns);
-						text = trimText(text, matches, Integer.parseInt(lengthlimit), Integer.parseInt(maxdistance));
-						if (text == null)
-							continue;
-
-						data.add(new DBData(doc.getString("source"), text, doc.getInteger("date_year", 0),
+						//text = trimText(text, matches, Integer.parseInt(lengthlimit), Integer.parseInt(maxdistance));
+						List<String> texts = trimTextMulti(text, matches, Math.max(Integer.parseInt(maxdistance), Integer.parseInt(lengthlimit)), substrings);
+						if (texts.size() == 0) continue;
+						
+						for (String t : texts)
+							data.add(new DBData(doc.getString("source"), t, doc.getInteger("date_year", 0),
 								doc.getInteger("date_month", 0)));
 					}
 					model.put("results", data);
@@ -232,7 +233,6 @@ public class WebApp implements spark.servlet.SparkApplication {
 	}
 
 	private String trimText(String text, String[] matches, int length, int maxdistance) {
-
 		int min = text.length() - 1;
 		int max = 0;
 		int minLength = 0;
@@ -265,49 +265,63 @@ public class WebApp implements spark.servlet.SparkApplication {
 
 		return text;
 	}
+	
+	
+	public static List<String> trimTextMulti(String text, String around, int contextNrOfWords) {
+		return trimTextMulti(text, around, contextNrOfWords, true);
+	}
+	
+	
+	public static List<String> trimTextMulti(String text, String[] around, int contextNrOfWords, boolean useSubstrings) {
+		List<String> out = new ArrayList<String>();
+		for (int i = 0; i < around.length; i++) {
+			out.addAll(trimTextMulti(text, around[i], contextNrOfWords, useSubstrings));
+		}
+		return out;
+	}
+	
+	public static List<String> trimTextMulti(String text, String around, int contextNrOfWords, boolean useSubstrings) {
+		List<String> out = new ArrayList<String>();
+		
+		String[] tokens = text.split(" ");
+		int min;
+		int max;
+		int ind = -1;
+		int count = countContains(text, around);
 
-	// public static List<String> trimTextMulti(String text, String around, int
-	// contextNrOfWords) {
-	// List<String> out = new ArrayList<String>();
-	//
-	// String[] tokens = text.split(" ");
-	// int min;
-	// int max;
-	// int ind = -1;
-	// int count = countContains(text, around);
-	//
-	// while (count > 0){
-	// for (int i = ind+1; i < tokens.length; i++) {
-	// if (tokens[i].contains(around)) {
-	// ind = i;
-	// min = Math.max(ind - contextNrOfWords, 0);
-	// max = Math.min(ind + contextNrOfWords + 1, tokens.length);
-	//
-	// StringBuilder sb = new StringBuilder();
-	// for (int j = min; j < max; j++) {
-	// sb.append(tokens[j]);
-	// sb.append(" ");
-	// }
-	// out.add(sb.toString());
-	// }
-	// }
-	// count--;
-	// }
-	//
-	// return out;
-	// }
-	//
-	//
-	// private static int countContains(String string, String substring){
-	// int count = 0;
-	// String[] tokens = string.split(" ");
-	//
-	// for (int i = 0; i < tokens.length; i++) {
-	// if (tokens[i].equals(substring)) count++;
-	// }
-	//
-	// return count;
-	// }
+		while (count > 0){
+			for (int i = ind+1; i < tokens.length; i++) {
+				if (useSubstrings && !tokens[i].contains(around)) continue;
+				if (!useSubstrings && !tokens[i].equalsIgnoreCase(around)) continue;
+				ind = i;
+				min = Math.max(ind - contextNrOfWords, 0);
+				max = Math.min(ind + contextNrOfWords + 1, tokens.length);
+				
+				StringBuilder sb = new StringBuilder();
+				for (int j = min; j < max; j++) {
+					sb.append(tokens[j]);
+					sb.append(" ");
+				}
+				out.add(sb.toString());
+			}
+			count--;
+		}
+
+		return out;
+	}
+	
+	
+	private static int countContains(String string, String substring){
+		int count = 0;
+		String[] tokens = string.split(" ");
+		
+		for (int i = 0; i < tokens.length; i++) {
+			if (tokens[i].equals(substring)) count++;
+		}
+		
+		return count;
+	}
+
 
 	public class DBData {
 		private String source;
