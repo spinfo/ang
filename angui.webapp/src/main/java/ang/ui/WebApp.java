@@ -28,6 +28,9 @@ public class WebApp implements spark.servlet.SparkApplication {
 
 	private MongoWrapper mongo;
 
+	/**
+	 * initialize MongoWrapper instance
+	 */
 	@Override
 	public void init() {
 		this.mongo = new MongoWrapper();
@@ -43,6 +46,15 @@ public class WebApp implements spark.servlet.SparkApplication {
 		mapRoutes();
 	}
 
+	/**
+	 * initialize MongoWrapper instance
+	 * @param user
+	 * @param pw
+	 * @param db
+	 * @param host
+	 * @param port
+	 * @param collection
+	 */
 	public void init(String user, String pw, String db, String host, String port, String collection) {
 		this.mongo = new MongoWrapper();
 		mongo.init(user, // USER
@@ -54,13 +66,16 @@ public class WebApp implements spark.servlet.SparkApplication {
 		mapRoutes();
 	}
 
+	/**
+	 * map URLs to actions
+	 */
 	public void mapRoutes() {
 		staticFileLocation("/spark/template/freemarker");
 
 		// set port
 		// port(8080);
 
-		// MAP /search
+		// MAP /search (main url)
 		get("/search", (request, response) -> {
 			// get params
 			boolean casesens = request.queryParams("casesens") != null;
@@ -150,18 +165,21 @@ public class WebApp implements spark.servlet.SparkApplication {
 			return new ModelAndView(model, "index.ftl");
 		} , new FreeMarkerEngine());
 
+		//redirect similar URLs/typos to /search
 		// MAP /search/
 		get("/search/", (request, response) -> {
 			response.redirect("/search");
 			return null;
 		});
 
+		//redirect root URL to /search
 		// MAP /
 		get("/", (request, response) -> {
 			response.redirect("/search");
 			return null;
 		});
 
+		//stop app (removed functionality)
 		// MAP /stopang
 		get("/stopang", (request, response) -> {
 			return "von wegen.";
@@ -174,6 +192,11 @@ public class WebApp implements spark.servlet.SparkApplication {
 		stop();
 	}
 
+	/**
+	 * parses the frontend query form to a simple regex
+	 * @param query
+	 * @return
+	 */
 	private String parseRegexQuery(String query) {
 		query = query.replaceAll("\\b(?=\\w)", "*").replaceAll("(?<=\\w)\\b", "*");
 
@@ -189,6 +212,12 @@ public class WebApp implements spark.servlet.SparkApplication {
 				.replaceAll(opt, opt);
 	}
 
+	/**
+	 * generates patterns from queries
+	 * @param queries
+	 * @param casesens
+	 * @return
+	 */
 	public Pattern[] generatePatterns(String[] queries, boolean casesens) {
 		List<Pattern> patterns = new ArrayList<Pattern>();
 		for (String q : queries) {
@@ -199,9 +228,18 @@ public class WebApp implements spark.servlet.SparkApplication {
 	}
 
 	private String[] splitQuery(String query) {
-		return query.replaceAll("\\.\\+", " ").replaceAll("\\\\\\w", "").replaceAll("[^\\p{L}\\s]", "").split("\\s");
+		return query.replaceAll("\\.\\+", " ")
+				.replaceAll("\\\\\\w", "")
+				.replaceAll("[^\\p{L}\\s]", "")
+				.split("\\s");
 	}
 
+	/**
+	 * finds matches of patterns in text and returns an array of the matches
+	 * @param text
+	 * @param patterns
+	 * @return
+	 */
 	private String[] findMatches(String text, Pattern[] patterns) {
 		if (text == null || text.length() == 0)
 			return new String[0];
@@ -215,6 +253,11 @@ public class WebApp implements spark.servlet.SparkApplication {
 		return matches.toArray(new String[matches.size()]);
 	}
 
+	/**
+	 * used to load DB connection data from properties file
+	 * @param propertiesFileName
+	 * @return
+	 */
 	private Properties loadProperties(String propertiesFileName) {
 		Properties properties = new Properties();
 		BufferedInputStream stream;
@@ -232,46 +275,46 @@ public class WebApp implements spark.servlet.SparkApplication {
 		return properties;
 	}
 
-	private String trimText(String text, String[] matches, int length, int maxdistance) {
-		int min = text.length() - 1;
-		int max = 0;
-		int minLength = 0;
-
-		// find first and last match boundaries
-		for (String m : matches) {
-			int i = 0;
-			while ((i = text.indexOf(m, i)) > -1) {
-				if (i < min) {
-					min = i;
-					minLength = m.length();
-				}
-				if (i > max) {
-					max = i;
-				}
-			}
-		}
-
-		// return null if distance too long
-		// if (max - min - minLength > maxdistance) return null;
-
-		// trim text if needed
-		if (text.length() > (length * 2) + (max - min)) {
-			int start = min - length;
-			int end = max + length;
-			start = Math.max(0, start);
-			end = Math.min(text.length(), end);
-			text = "[...] " + text.substring(start, end) + " [...]";
-		}
-
-		return text;
-	}
+//	private String trimText(String text, String[] matches, int length, int maxdistance) {
+//		int min = text.length() - 1;
+//		int max = 0;
+//		int minLength = 0;
+//
+//		// find first and last match boundaries
+//		for (String m : matches) {
+//			int i = 0;
+//			while ((i = text.indexOf(m, i)) > -1) {
+//				if (i < min) {
+//					min = i;
+//					minLength = m.length();
+//				}
+//				if (i > max) {
+//					max = i;
+//				}
+//			}
+//		}
+//
+//		// return null if distance too long
+//		// if (max - min - minLength > maxdistance) return null;
+//
+//		// trim text if needed
+//		if (text.length() > (length * 2) + (max - min)) {
+//			int start = min - length;
+//			int end = max + length;
+//			start = Math.max(0, start);
+//			end = Math.min(text.length(), end);
+//			text = "[...] " + text.substring(start, end) + " [...]";
+//		}
+//
+//		return text;
+//	}
 	
-	
+	//text trimming
 	public static List<String> trimTextMulti(String text, String around, int contextNrOfWords) {
 		return trimTextMulti(text, around, contextNrOfWords, true);
 	}
 	
-	
+	//text trimming
 	public static List<String> trimTextMulti(String text, String[] around, int contextNrOfWords, boolean useSubstrings) {
 		List<String> out = new ArrayList<String>();
 		for (int i = 0; i < around.length; i++) {
@@ -280,6 +323,7 @@ public class WebApp implements spark.servlet.SparkApplication {
 		return out;
 	}
 	
+	//text trimming and extraction
 	public static List<String> trimTextMulti(String text, String around, int contextNrOfWords, boolean useSubstrings) {
 		List<String> out = new ArrayList<String>();
 		
@@ -322,7 +366,10 @@ public class WebApp implements spark.servlet.SparkApplication {
 		return count;
 	}
 
-
+	/*
+	 * anonymous data class to represent one db
+	 * entry object for the webapp (model)
+	 */
 	public class DBData {
 		private String source;
 		private String text;
