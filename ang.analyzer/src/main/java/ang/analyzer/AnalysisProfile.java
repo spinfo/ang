@@ -10,6 +10,7 @@ import java.util.Set;
 
 public class AnalysisProfile {
 
+	//fields holding analysis data
 	private String id;
 	private Map<String, Integer> terms;
 	private List<String> sources;
@@ -23,10 +24,12 @@ public class AnalysisProfile {
 	private boolean useStopwords;
 	private boolean useOnlyContexts;
 	
-	private List<File> corpus;
-	private StringBuilder results;
+	private List<File> corpus; //list of corpus files relevant for the analysis
+	private StringBuilder results; //StringBuilder instance to build the results text
 	
-	
+	/**
+	 * defaults constructor
+	 */
 	public AnalysisProfile(){
 		super();
 		this.terms = new HashMap<String, Integer>();
@@ -42,6 +45,17 @@ public class AnalysisProfile {
 		this.corpus = new ArrayList<File>();
 	}
 
+	/**
+	 * constructor getting analysis parameters from command line
+	 * @param terms
+	 * @param sources
+	 * @param yearFrom
+	 * @param yearTo
+	 * @param contextSize
+	 * @param useCompounds
+	 * @param useStopwords
+	 * @param useOnlyContexts
+	 */
 	public AnalysisProfile(
 			String[] terms,
 			String[] sources,
@@ -62,6 +76,9 @@ public class AnalysisProfile {
 		this.useOnlyContexts = useOnlyContexts;
 	}
 	
+	/**
+	 * generate ID for this analysis
+	 */
 	private void generateID(){
 		StringBuilder sb = new StringBuilder();
 		for (String t : terms.keySet())
@@ -114,6 +131,11 @@ public class AnalysisProfile {
 		return stopWords;
 	}
 	
+	/**
+	 * returns a corpus file ID for a term
+	 * @param term
+	 * @return
+	 */
 	public String getCorpusFileIDFor(String term){
 		if (terms.get(term.toUpperCase()) == null){
 			System.err.println("[ERROR]\tterm \"" + term + "\" not in profiles terms list!");
