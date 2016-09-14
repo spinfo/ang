@@ -137,11 +137,11 @@
 						<option value="intro" <#if source == "intro">selected</#if>>Intro-Archiv (mit Datum)</option>
 					</select>
 					<br/><br/>
-					<label for="lengthLimitInput">Zeichen vor und nach Fundstelle:</label>&nbsp;
-					<input type="number" id="lengthLimitInput" name="lengthlimit" min="10" value='${lengthlimit!"200"}' />
+					<label for="lengthLimitInput">Wörter vor und nach Fundstelle:</label>&nbsp;
+					<input type="number" id="lengthLimitInput" name="lengthlimit" min="10" value='${lengthlimit!"20"}' />
 					<br/>
 					<label for="maxDistanceInput">max. Abstand mehrerer Suchbegriffe:</label>&nbsp;
-					<input type="number" id="maxDistanceInput" name="maxdistance" min="1" max="1000" value='${maxdistance!"100"}' />
+					<input type="number" id="maxDistanceInput" name="maxdistance" min="0" max="10" value='${maxdistance!"10"}' />
 					<br/>
 					<label for="limitResultsInput">Anzahl der Fundstellen limitieren auf:</label>&nbsp;
 					<input type="number" id="limitResultsInput" name="limitresults" min="100" value='${limitresults!"100"}' />
