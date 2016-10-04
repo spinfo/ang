@@ -75,40 +75,36 @@ public class AngStringUtils {
 		int min;
 		int max;
 		int ind = -1;
-		int count = countContains(text, around);
 
-		while (count > 0){
-			for (int i = ind+1; i < tokens.length; i++) {
-				if (useSubstrings && !tokens[i].contains(around)) continue;
-				if (!useSubstrings && !tokens[i].equalsIgnoreCase(around)) continue;
-				ind = i;
-				min = Math.max(ind - contextNrOfWords, 0);
-				max = Math.min(ind + contextNrOfWords + 1, tokens.length);
-				
-				StringBuilder sb = new StringBuilder();
-				for (int j = min; j < max; j++) {
-					sb.append(tokens[j]);
-					sb.append(" ");
-				}
-				out.add(sb.toString());
+		for (int i = ind+1; i < tokens.length; i++) {
+			if (useSubstrings && !tokens[i].contains(around)) continue;
+			if (!useSubstrings && !tokens[i].equalsIgnoreCase(around)) continue;
+			ind = i;
+			min = Math.max(ind - contextNrOfWords, 0);
+			max = Math.min(ind + contextNrOfWords + 1, tokens.length);
+			
+			StringBuilder sb = new StringBuilder();
+			for (int j = min; j < max; j++) {
+				sb.append(tokens[j]);
+				sb.append(" ");
 			}
-			count--;
+			out.add(sb.toString());
 		}
 
 		return out;
 	}
 	
 	
-	private static int countContains(String string, String substring){
-		int count = 0;
-		String[] tokens = string.split(" ");
-		
-		for (int i = 0; i < tokens.length; i++) {
-			if (tokens[i].equals(substring)) count++;
-		}
-		
-		return count;
-	}
+//	private static int countContains(String string, String substring){
+//		int count = 0;
+//		String[] tokens = string.split(" ");
+//		
+//		for (int i = 0; i < tokens.length; i++) {
+//			if (tokens[i].equals(substring)) count++;
+//		}
+//		
+//		return count;
+//	}
 	
 	
 	public static String humanReadableByteCount(long bytes) {
