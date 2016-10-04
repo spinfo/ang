@@ -143,11 +143,7 @@ public class AnalysisProfile {
 		} else {
 			String src = "";
 			for (String s : sources) src += "_" + s;
-			return term.toUpperCase()
-						.replaceAll("Ä", "AE")
-						.replaceAll("Ö", "OE")
-						.replaceAll("Ü", "UE")
-						.replaceAll("ß", "SS") + src
+			return term.toUpperCase().replaceAll("[^A-Za-z]", "") + src
 					+ (yearFrom != -1 ? "_" + yearFrom : "")
 					+ (yearTo != -1 ? "_" + yearTo : "")
 					+ (useCompounds ? "" : "_NOCOMP")

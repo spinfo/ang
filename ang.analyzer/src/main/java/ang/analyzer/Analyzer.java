@@ -100,11 +100,12 @@ public class Analyzer {
 		int countCache = 0;
 		int countFresh = 0;
 		for (String t : profile.getTermsSet()){
-			System.out.print("[INFO]\tgenerating corpus for \"" + t + "\"... ");
+			System.out.println("[INFO]\tgenerating corpus for \"" + t + "\"... ");
+			System.out.println("[INFO]\tcorpus file ID: " + profile.getCorpusFileIDFor(t));
 			File corpusFile;
 			//check cache directory for existing corpus file
 			if ((corpusFile = checkForExistingCorpusFile(profile.getCorpusFileIDFor(t))) != null){
-				System.out.println(" found corpus file in cache: " + corpusFile.getName());
+				System.out.println("[INFO]\tfound corpus file in cache: " + corpusFile.getName());
 				countCache++;
 			} else {
 				corpusFile = new File(CACHE_DIR + SEP + profile.getCorpusFileIDFor(t) + ".txt");
