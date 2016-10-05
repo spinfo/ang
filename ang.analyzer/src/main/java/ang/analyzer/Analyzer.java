@@ -222,7 +222,7 @@ public class Analyzer {
 				double val = ((double) e.getValue() / (double) occCount);
 				if (maxVal == -1) maxVal = val;
 				sb.append(barGraph(val, maxVal, 20) + "\t");
-				sb.append(e.getKey() + "\t" + val + "\n");
+				sb.append(e.getKey() + "\tHäufigkeit: " + e.getValue() + "\tAnteil: " + val + "\n");
 				count++;
 			} else {
 				it.remove();
