@@ -70,6 +70,9 @@ public class Analyzer {
 		// calculate semantic similarity (first order)
 		profile.addToResults(calculateSimilarity(profile));
 		
+		// calculate terms specialization by co-occurrance distribution
+		profile.addToResults(calculateSpecialization(profile));
+		
 		//cleanup
 		System.out.println("\n[INFO]\tdone.\n");
 		if (this.mongo != null)
@@ -245,6 +248,31 @@ public class Analyzer {
 		sb.append("\nKorpushäufigkeit von " + term + ": " + occCount + "\n\n");
 
 		return sb.toString();
+	}
+	
+	private String calculateSpecialization(AnalysisProfile profile){
+		StringBuilder sb = new StringBuilder();
+		sb.append("\n\nGrad der Spezialisierung der Terme\n"
+				+ "(berechnet anhand der Verteilung der Kookkurenzen)\n"
+				+ OUTPUT_SECTION_SEPARATOR + "\n");
+		
+		for (String t1 : profile.getTermsSet())
+			sb.append(t1 + ":\t" + calculateSpecialization(profile.getCoOccurrences(t1)));
+		
+		return sb.toString();
+	}
+	
+	private double calculateSpecialization(Map<String, Integer> coOcs){
+		coOcs = sortMapByValue(coOcs, false);
+		double count = 0;
+		int max = -1;
+		
+		for (Entry<String,Integer> e : coOcs.entrySet()){
+			if (max == -1) max = e.getValue();
+			count += 1 - (e.getValue() / max);
+		}
+		
+		return count / (double)coOcs.size();
 	}
 	
 	private String calculateSimilarity(AnalysisProfile profile){
