@@ -273,7 +273,7 @@ public class Analyzer {
 				+ OUTPUT_SECTION_SEPARATOR + "\n");
 		
 		for (String t1 : profile.getTermsSet())
-			sb.append(t1 + ":\t" + calculateSpecialization(profile.getCoOccurrences(t1)));
+			sb.append(t1 + ":\t" + calculateSpecialization(profile.getCoOccurrences(t1)) + "\n");
 		
 		return sb.toString();
 	}
