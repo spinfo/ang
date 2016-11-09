@@ -2,6 +2,7 @@ package ang.analyzer;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,7 +39,22 @@ public class Analyzer {
 
 	private void init() {
 		this.mongo = new MongoWrapper();
-		Properties props = IO.loadProperties("db.properties", this.getClass());
+
+		//load properties
+		ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		Properties props = new Properties();
+		try(InputStream resourceStream = loader.getResourceAsStream("db.properties")) {
+		    props.load(resourceStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
+		//check properties
+		if (props.isEmpty()){
+			System.err.println("[ERROR]\tproperties could not be loaded :'(");
+			System.exit(0);
+		}
 		
 		mongo.init(props.getProperty("user"), // USER
 				props.getProperty("pw"), // PASS
