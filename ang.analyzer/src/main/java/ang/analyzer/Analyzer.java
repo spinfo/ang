@@ -281,11 +281,14 @@ public class Analyzer {
 	private double calculateSpecialization(Map<String, Integer> coOcs){
 		coOcs = sortMapByValue(coOcs, false);
 		double count = 0;
-		int last = -1;
+		double last = -1;
+		double max = -1;
 		
 		for (Entry<String,Integer> e : coOcs.entrySet()){
+			if (max == -1)
+				max = e.getValue();
 			if (last != -1)
-				count += (last - e.getValue());
+				count += (last - e.getValue()) / max;
 			last = e.getValue();
 		}
 		
