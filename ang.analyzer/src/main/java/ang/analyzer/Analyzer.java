@@ -292,7 +292,7 @@ public class Analyzer {
 			last = e.getValue();
 		}
 		
-		return count / (double)coOcs.size();
+		return count;
 	}
 	
 	private String calculateSimilarity(AnalysisProfile profile){
